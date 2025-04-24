@@ -21,6 +21,15 @@ app.set("io", io);
 // Connect to MongoDB
 connectDB();
 
+process.on("uncaughtException", (err) => {
+  console.error("💥 Uncaught Exception:", JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("💥 Unhandled Rejection at:", promise);
+  console.error("Reason:", JSON.stringify(reason, Object.getOwnPropertyNames(reason), 2));
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());

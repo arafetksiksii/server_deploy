@@ -17,4 +17,23 @@ router.get("/", getAllEvents);
 router.get("/:id", getEventById);
 router.delete("/:id", deleteEvent);
 
+
+
+router.post("/debug-upload", upload.single("image"), (req, res) => {
+  console.log("📥 Reached /debug-upload");
+  console.log("🧾 req.body:", req.body);
+  console.log("🖼️ req.file:", req.file);
+
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  res.json({
+    message: "Upload successful",
+    file: req.file,
+  });
+});
+
+
+
 module.exports = router;
