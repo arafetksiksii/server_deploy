@@ -3,17 +3,16 @@ const Presentation = require("../models/Presentation");
 exports.createPresentation = async (req, res) => {
   try {
     const { title, content } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : "";
+    const image = req.file ? req.file.path : ""; // ✅ Cloudinary image URL
 
     const presentation = new Presentation({
       title,
       content,
-      image
+      image,
     });
 
     await presentation.save();
 
-    // 🟢 Emit new presentation to all clients
     const io = req.app.get("io");
     io.emit("presentationCreated", presentation);
 
@@ -52,14 +51,13 @@ exports.updatePresentation = async (req, res) => {
     };
 
     if (req.file) {
-      updateFields.image = `/uploads/${req.file.filename}`;
+      updateFields.image = req.file.path; // ✅ Cloudinary image URL
     }
 
     const presentation = await Presentation.findByIdAndUpdate(req.params.id, updateFields, { new: true });
 
     if (!presentation) return res.status(404).json({ message: "Presentation not found" });
 
-    // 🔵 Emit update
     const io = req.app.get("io");
     io.emit("presentationUpdated", presentation);
 
@@ -74,7 +72,6 @@ exports.deletePresentation = async (req, res) => {
     const presentation = await Presentation.findByIdAndDelete(req.params.id);
     if (!presentation) return res.status(404).json({ message: "Presentation not found" });
 
-    // 🔴 Emit deletion
     const io = req.app.get("io");
     io.emit("presentationDeleted", presentation._id);
 

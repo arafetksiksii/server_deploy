@@ -3,12 +3,11 @@ const Boisson = require("../models/Boisson");
 exports.createBoisson = async (req, res) => {
   try {
     const { title, price, quantity, description } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : "";
+    const image = req.file ? req.file.path : ""; // ✅ Cloudinary image URL
 
     const boisson = new Boisson({ title, price, quantity, description, image });
     await boisson.save();
 
-    // 🔴 Emit creation
     const io = req.app.get("io");
     io.emit("boissonCreated", boisson);
 
@@ -40,15 +39,21 @@ exports.getBoissonById = async (req, res) => {
 exports.updateBoisson = async (req, res) => {
   try {
     const { title, price, quantity, description } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
 
-    const updateFields = { title, price, quantity, description };
-    if (image) updateFields.image = image;
+    const updateFields = {
+      title,
+      price,
+      quantity,
+      description,
+    };
+
+    if (req.file) {
+      updateFields.image = req.file.path; // ✅ Cloudinary image URL
+    }
 
     const boisson = await Boisson.findByIdAndUpdate(req.params.id, updateFields, { new: true });
     if (!boisson) return res.status(404).json({ message: "Boisson not found" });
 
-    // 🔵 Emit update
     const io = req.app.get("io");
     io.emit("boissonUpdated", boisson);
 
@@ -63,7 +68,6 @@ exports.deleteBoisson = async (req, res) => {
     const boisson = await Boisson.findByIdAndDelete(req.params.id);
     if (!boisson) return res.status(404).json({ message: "Boisson not found" });
 
-    // 🟠 Emit deletion
     const io = req.app.get("io");
     io.emit("boissonDeleted", boisson._id);
 

@@ -3,7 +3,7 @@ const Event = require("../models/Event");
 exports.createEvent = async (req, res) => {
   try {
     const { title, description, date, location, price, participants } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : "";
+    const image = req.file ? req.file.path : ""; // 🌩️ Cloudinary provides full image URL
 
     const event = new Event({
       title,
@@ -12,12 +12,11 @@ exports.createEvent = async (req, res) => {
       location,
       price,
       participants,
-      image
+      image,
     });
 
     await event.save();
 
-    // 🔴 Emit creation to clients
     const io = req.app.get("io");
     io.emit("eventCreated", event);
 
@@ -60,14 +59,13 @@ exports.updateEvent = async (req, res) => {
     };
 
     if (req.file) {
-      updateFields.image = `/uploads/${req.file.filename}`;
+      updateFields.image = req.file.path; // ✅ Use Cloudinary's image URL
     }
 
     const event = await Event.findByIdAndUpdate(req.params.id, updateFields, { new: true });
 
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-    // 🔵 Emit update to clients
     const io = req.app.get("io");
     io.emit("eventUpdated", event);
 
@@ -76,6 +74,7 @@ exports.updateEvent = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.deleteEvent = async (req, res) => {
   try {

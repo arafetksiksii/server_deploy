@@ -6,13 +6,12 @@ const path = require("path");
 exports.createMenu = async (req, res) => {
   try {
     const { title, items } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : "";
+    const image = req.file ? req.file.path : ""; // ✅ Cloudinary URL
     const parsedItems = items ? JSON.parse(items) : [];
 
     const menu = new Menu({ title, items: parsedItems, image });
     await menu.save();
 
-    // 🔴 Emit creation
     const io = req.app.get("io");
     io.emit("menuCreated", menu);
 
@@ -45,7 +44,6 @@ exports.getMenuById = async (req, res) => {
 exports.updateMenu = async (req, res) => {
   try {
     const { title, items } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
     const parsedItems = items ? JSON.parse(items) : [];
 
     const updateFields = {
@@ -53,12 +51,13 @@ exports.updateMenu = async (req, res) => {
       items: parsedItems,
     };
 
-    if (image) updateFields.image = image;
+    if (req.file) {
+      updateFields.image = req.file.path; // ✅ Cloudinary URL
+    }
 
     const menu = await Menu.findByIdAndUpdate(req.params.id, updateFields, { new: true });
     if (!menu) return res.status(404).json({ message: "Menu not found" });
 
-    // 🔵 Emit update
     const io = req.app.get("io");
     io.emit("menuUpdated", menu);
 
@@ -74,7 +73,6 @@ exports.deleteMenu = async (req, res) => {
     const menu = await Menu.findByIdAndDelete(req.params.id);
     if (!menu) return res.status(404).json({ message: "Menu not found" });
 
-    // 🟠 Emit deletion
     const io = req.app.get("io");
     io.emit("menuDeleted", menu._id);
 
@@ -84,7 +82,7 @@ exports.deleteMenu = async (req, res) => {
   }
 };
 
-// 📄 PDF download remains unchanged
+// 📄 PDF generation remains unchanged
 exports.downloadMenuPDF = async (req, res) => {
   try {
     const menu = await Menu.findById(req.params.id);
