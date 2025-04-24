@@ -2,8 +2,12 @@ const Event = require("../models/Event");
 
 exports.createEvent = async (req, res) => {
   try {
+    console.log("📥 Incoming createEvent request");
+    console.log("🧾 req.body:", req.body);
+    console.log("📸 req.file:", req.file);
+
     const { title, description, date, location, price, participants } = req.body;
-    const image = req.file ? req.file.path : ""; // 🌩️ Cloudinary provides full image URL
+    const image = req.file ? req.file.path : "";
 
     const event = new Event({
       title,
@@ -20,8 +24,11 @@ exports.createEvent = async (req, res) => {
     const io = req.app.get("io");
     io.emit("eventCreated", event);
 
+    console.log("✅ Event created:", event);
+
     res.status(201).json(event);
   } catch (err) {
+    console.error("❌ Error in createEvent:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
@@ -47,6 +54,10 @@ exports.getEventById = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
   try {
+    console.log("📥 Incoming updateEvent request for ID:", req.params.id);
+    console.log("🧾 req.body:", req.body);
+    console.log("📸 req.file:", req.file);
+
     const { title, description, date, location, price, participants } = req.body;
 
     const updateFields = {
@@ -59,21 +70,28 @@ exports.updateEvent = async (req, res) => {
     };
 
     if (req.file) {
-      updateFields.image = req.file.path; // ✅ Use Cloudinary's image URL
+      updateFields.image = req.file.path;
     }
 
     const event = await Event.findByIdAndUpdate(req.params.id, updateFields, { new: true });
 
-    if (!event) return res.status(404).json({ message: "Event not found" });
+    if (!event) {
+      console.warn("⚠️ Event not found for update:", req.params.id);
+      return res.status(404).json({ message: "Event not found" });
+    }
 
     const io = req.app.get("io");
     io.emit("eventUpdated", event);
 
+    console.log("✅ Event updated:", event);
+
     res.status(200).json(event);
   } catch (err) {
+    console.error("❌ Error in updateEvent:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 exports.deleteEvent = async (req, res) => {
