@@ -8,17 +8,15 @@ const connectDB = require("./config/db");
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
-
-// ⚠️ Replace with your real frontend domain
-const FRONTEND_ORIGIN = "https://itbafa.com";
-
 const io = new Server(server, {
   cors: {
-    origin: ["https://itbafa.com", "http://localhost:3000"],
+    origin: "https://itbafa.com",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
 });
+
+
 
 // Expose io globally so controllers can access it
 app.set("io", io);
@@ -35,13 +33,12 @@ process.on("unhandledRejection", (reason, promise) => {
   console.error("Reason:", JSON.stringify(reason, Object.getOwnPropertyNames(reason), 2));
 });
 
-// ✅ Updated CORS middleware for Express
+// Middleware
 app.use(cors({
-  origin: FRONTEND_ORIGIN,
+  origin: "https://itbafa.com", // or use an array if needed
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
-
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
