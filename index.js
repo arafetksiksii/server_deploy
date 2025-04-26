@@ -10,13 +10,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://itbafa.com", "http://localhost:3000"],
+    origin: ["https://itbafa.com"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
 });
-
-
 
 // Expose io globally so controllers can access it
 app.set("io", io);
@@ -35,7 +33,7 @@ process.on("unhandledRejection", (reason, promise) => {
 
 // Middleware
 app.use(cors({
-  origin: ["https://itbafa.com", "http://localhost:3000"],
+  origin: ["https://itbafa.com"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -54,9 +52,6 @@ const restaurantRoutes = require("./routes/restaurantRoutes");
 const seminaireRoutes = require("./routes/seminaireRoutes");
 const spaRoutes = require("./routes/spaRoutes");
 const loisirRoutes = require("./routes/loisirRoutes");
-
-
-
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
@@ -88,5 +83,5 @@ io.on("connection", (socket) => {
 // Start the server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () =>
-  console.log(`🚀 Server with Socket.IO running on http://localhost:${PORT}`)
+  console.log(`🚀 Server with Socket.IO running on port ${PORT}`)
 );
