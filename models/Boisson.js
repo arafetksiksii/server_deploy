@@ -21,6 +21,11 @@ const boissonSchema = new mongoose.Schema({
   image: {
     type: String,
     default: ""
+  },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "CategoryBoisson",
+    required: true
   }
 }, { timestamps: true });
 

@@ -5,11 +5,11 @@ const path = require("path");
 
 exports.createMenu = async (req, res) => {
   try {
-    const { title, items } = req.body;
-    const image = req.file ? req.file.path : ""; // ✅ Cloudinary URL
+    const { title, items, restaurant } = req.body; // Added restaurant
+    const image = req.file ? req.file.path : "";
     const parsedItems = items ? JSON.parse(items) : [];
 
-    const menu = new Menu({ title, items: parsedItems, image });
+    const menu = new Menu({ title, items: parsedItems, image, restaurant });
     await menu.save();
 
     const io = req.app.get("io");
@@ -24,7 +24,7 @@ exports.createMenu = async (req, res) => {
 
 exports.getAllMenus = async (req, res) => {
   try {
-    const menus = await Menu.find();
+    const menus = await Menu.find().populate("restaurant", "name"); // Populate restaurant name
     res.status(200).json(menus);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -33,7 +33,7 @@ exports.getAllMenus = async (req, res) => {
 
 exports.getMenuById = async (req, res) => {
   try {
-    const menu = await Menu.findById(req.params.id);
+    const menu = await Menu.findById(req.params.id).populate("restaurant", "name");
     if (!menu) return res.status(404).json({ message: "Menu not found" });
     res.status(200).json(menu);
   } catch (err) {
@@ -43,16 +43,17 @@ exports.getMenuById = async (req, res) => {
 
 exports.updateMenu = async (req, res) => {
   try {
-    const { title, items } = req.body;
+    const { title, items, restaurant } = req.body; // Added restaurant
     const parsedItems = items ? JSON.parse(items) : [];
 
     const updateFields = {
       title,
       items: parsedItems,
+      restaurant,
     };
 
     if (req.file) {
-      updateFields.image = req.file.path; // ✅ Cloudinary URL
+      updateFields.image = req.file.path;
     }
 
     const menu = await Menu.findByIdAndUpdate(req.params.id, updateFields, { new: true });

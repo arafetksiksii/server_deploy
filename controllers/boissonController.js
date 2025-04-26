@@ -2,10 +2,10 @@ const Boisson = require("../models/Boisson");
 
 exports.createBoisson = async (req, res) => {
   try {
-    const { title, price, quantity, description } = req.body;
-    const image = req.file ? req.file.path : ""; // ✅ Cloudinary image URL
+    const { title, price, quantity, description, category } = req.body; // Added category
+    const image = req.file ? req.file.path : "";
 
-    const boisson = new Boisson({ title, price, quantity, description, image });
+    const boisson = new Boisson({ title, price, quantity, description, image, category });
     await boisson.save();
 
     const io = req.app.get("io");
@@ -19,7 +19,7 @@ exports.createBoisson = async (req, res) => {
 
 exports.getAllBoissons = async (req, res) => {
   try {
-    const boissons = await Boisson.find();
+    const boissons = await Boisson.find().populate("category", "name"); // Populate category name
     res.status(200).json(boissons);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -28,7 +28,7 @@ exports.getAllBoissons = async (req, res) => {
 
 exports.getBoissonById = async (req, res) => {
   try {
-    const boisson = await Boisson.findById(req.params.id);
+    const boisson = await Boisson.findById(req.params.id).populate("category", "name");
     if (!boisson) return res.status(404).json({ message: "Boisson not found" });
     res.status(200).json(boisson);
   } catch (err) {
@@ -38,17 +38,18 @@ exports.getBoissonById = async (req, res) => {
 
 exports.updateBoisson = async (req, res) => {
   try {
-    const { title, price, quantity, description } = req.body;
+    const { title, price, quantity, description, category } = req.body; // Added category
 
     const updateFields = {
       title,
       price,
       quantity,
       description,
+      category,
     };
 
     if (req.file) {
-      updateFields.image = req.file.path; // ✅ Cloudinary image URL
+      updateFields.image = req.file.path;
     }
 
     const boisson = await Boisson.findByIdAndUpdate(req.params.id, updateFields, { new: true });

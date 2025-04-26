@@ -8,9 +8,13 @@ const itemSchema = new mongoose.Schema({
 
 const menuSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  image: String, // ✅ Add this
+  image: String,
   items: [itemSchema],
+  restaurant: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Restaurant",
+    required: true
+  }
 }, { timestamps: true });
-
 
 module.exports = mongoose.model("Menu", menuSchema);
