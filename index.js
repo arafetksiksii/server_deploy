@@ -10,7 +10,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://itbafa.com"],
+    origin: ["https://itbafa.com", "http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
@@ -33,7 +33,7 @@ process.on("unhandledRejection", (reason, promise) => {
 
 // Middleware
 app.use(cors({
-  origin: ["https://itbafa.com"],
+  origin: ["https://itbafa.com", "http://localhost:3000"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -52,6 +52,10 @@ const restaurantRoutes = require("./routes/restaurantRoutes");
 const seminaireRoutes = require("./routes/seminaireRoutes");
 const spaRoutes = require("./routes/spaRoutes");
 const loisirRoutes = require("./routes/loisirRoutes");
+const skyLoungeRoutes = require("./routes/skyLoungeRoutes");
+const evenementRoutes = require("./routes/evenementRoutes");
+const roomServiceRoutes = require("./routes/roomServiceRoutes");
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
@@ -64,6 +68,9 @@ app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/seminaires", seminaireRoutes);
 app.use("/api/spas", spaRoutes);
 app.use("/api/loisirs", loisirRoutes);
+app.use("/api/sky-lounges", skyLoungeRoutes);
+app.use("/api/evenements", evenementRoutes);
+app.use("/api/room-services", roomServiceRoutes);
 
 // Protected route example
 const authenticateToken = require("./middleware/authMiddleware");
