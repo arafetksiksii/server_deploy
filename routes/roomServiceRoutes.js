@@ -14,5 +14,6 @@ router.get("/", getAllRoomServices);
 router.get("/:id", getRoomServiceById);
 router.put("/:id", updateRoomService);
 router.delete("/:id", deleteRoomService);
+router.put("/:id/add-menu", addMenuToRoomService);
 
 module.exports = router;

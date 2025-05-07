@@ -2,7 +2,7 @@ const RoomService = require("../models/RoomService");
 
 exports.createRoomService = async (req, res) => {
   try {
-    const { name, description, menus } = req.body;
+    const { name, description, menus = [] } = req.body;
 
     const roomService = new RoomService({ name, description, menus });
     await roomService.save();
@@ -16,6 +16,7 @@ exports.createRoomService = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.getAllRoomServices = async (req, res) => {
   try {
@@ -40,11 +41,16 @@ exports.updateRoomService = async (req, res) => {
   try {
     const { name, description, menus } = req.body;
 
+    const updateFields = { name, description };
+    if (menus) {
+      updateFields.menus = menus;
+    }
+
     const service = await RoomService.findByIdAndUpdate(
       req.params.id,
-      { name, description, menus },
+      updateFields,
       { new: true }
-    );
+    ).populate("menus");
 
     if (!service) return res.status(404).json({ message: "Room Service not found" });
 
@@ -58,6 +64,7 @@ exports.updateRoomService = async (req, res) => {
   }
 };
 
+
 exports.deleteRoomService = async (req, res) => {
   try {
     const service = await RoomService.findByIdAndDelete(req.params.id);
@@ -67,6 +74,23 @@ exports.deleteRoomService = async (req, res) => {
     io.emit("roomServiceDeleted", service._id);
 
     res.status(200).json({ message: "Room Service deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+// PUT /room-services/:id/add-menu
+exports.addMenuToRoomService = async (req, res) => {
+  try {
+    const { menuId } = req.body;
+    const service = await RoomService.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { menus: menuId } },
+      { new: true }
+    ).populate("menus");
+
+    if (!service) return res.status(404).json({ message: "Room Service not found" });
+
+    res.status(200).json(service);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
