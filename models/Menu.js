@@ -19,8 +19,12 @@ const menuSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "RoomService",
     required: false
+  },
+  skyLounge: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "SkyLounge",
+    required: false
   }
 }, { timestamps: true });
-
 
 module.exports = mongoose.model("Menu", menuSchema);

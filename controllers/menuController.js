@@ -5,11 +5,11 @@ const path = require("path");
 
 exports.createMenu = async (req, res) => {
   try {
-    const { title, items, restaurant, roomService } = req.body;
+    const { title, items, restaurant, roomService, skyLounge } = req.body;
     const image = req.file ? req.file.path : "";
     const parsedItems = items ? JSON.parse(items) : [];
 
-    const menu = new Menu({ title, items: parsedItems, image, restaurant, roomService });
+    const menu = new Menu({ title, items: parsedItems, image, restaurant, roomService, skyLounge });
     await menu.save();
 
     const io = req.app.get("io");
@@ -43,13 +43,15 @@ exports.getMenuById = async (req, res) => {
 
 exports.updateMenu = async (req, res) => {
   try {
-    const { title, items, restaurant } = req.body; // Added restaurant
+    const { title, items, restaurant, roomService, skyLounge } = req.body;
     const parsedItems = items ? JSON.parse(items) : [];
 
     const updateFields = {
       title,
       items: parsedItems,
       restaurant,
+      roomService,
+      skyLounge
     };
 
     if (req.file) {
@@ -68,6 +70,7 @@ exports.updateMenu = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.deleteMenu = async (req, res) => {
   try {

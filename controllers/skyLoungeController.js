@@ -20,7 +20,7 @@ exports.createSkyLounge = async (req, res) => {
 
 exports.getAllSkyLounges = async (req, res) => {
   try {
-    const skyLounges = await SkyLounge.find();
+    const skyLounges = await SkyLounge.find().populate("menus");
     res.status(200).json(skyLounges);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -29,7 +29,7 @@ exports.getAllSkyLounges = async (req, res) => {
 
 exports.getSkyLoungeById = async (req, res) => {
   try {
-    const skyLounge = await SkyLounge.findById(req.params.id);
+    const skyLounge = await SkyLounge.findById(req.params.id).populate("menus");
     if (!skyLounge) return res.status(404).json({ message: "Sky Lounge not found" });
     res.status(200).json(skyLounge);
   } catch (err) {
@@ -69,6 +69,24 @@ exports.deleteSkyLounge = async (req, res) => {
 
     res.status(200).json({ message: "Sky Lounge deleted successfully" });
   } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+exports.addMenuToSkyLounge = async (req, res) => {
+  try {
+    const { menuId } = req.body;
+
+    const skyLounge = await SkyLounge.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { menus: menuId } },
+      { new: true }
+    ).populate("menus");
+
+    if (!skyLounge) return res.status(404).json({ message: "Sky Lounge not found" });
+
+    res.status(200).json(skyLounge);
+  } catch (err) {
+    console.error("❌ Error adding menu to Sky Lounge:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
