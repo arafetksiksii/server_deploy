@@ -3,12 +3,17 @@ const Restaurant = require("../models/Restaurant");
 exports.createRestaurant = async (req, res) => {
   try {
     const { name, description } = req.body;
+    const image = req.file ? req.file.path : "";
 
-    const restaurant = new Restaurant({ name, description });
+    const restaurant = new Restaurant({ name, description, image });
     await restaurant.save();
+
+    const io = req.app.get("io");
+    io.emit("restaurantCreated", restaurant);
 
     res.status(201).json(restaurant);
   } catch (err) {
+    console.error("❌ Error creating restaurant:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
@@ -35,16 +40,25 @@ exports.getRestaurantById = async (req, res) => {
 exports.updateRestaurant = async (req, res) => {
   try {
     const { name, description } = req.body;
+    const updateFields = { name, description };
+
+    if (req.file) {
+      updateFields.image = req.file.path;
+    }
 
     const restaurant = await Restaurant.findByIdAndUpdate(
       req.params.id,
-      { name, description },
+      updateFields,
       { new: true }
     );
     if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
 
+    const io = req.app.get("io");
+    io.emit("restaurantUpdated", restaurant);
+
     res.status(200).json(restaurant);
   } catch (err) {
+    console.error("❌ Error updating restaurant:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
@@ -53,6 +67,9 @@ exports.deleteRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findByIdAndDelete(req.params.id);
     if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
+
+    const io = req.app.get("io");
+    io.emit("restaurantDeleted", restaurant._id);
 
     res.status(200).json({ message: "Restaurant deleted successfully" });
   } catch (err) {

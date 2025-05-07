@@ -2,9 +2,9 @@ const Reservation = require("../models/Reservation");
 
 exports.createReservation = async (req, res) => {
   try {
-    const { name, from, to, people } = req.body;
+    const { name, email, from, to, people } = req.body;
 
-    const reservation = new Reservation({ name, from, to, people });
+    const reservation = new Reservation({ name, email, from, to, people });
     await reservation.save();
 
     res.status(201).json(reservation);
@@ -34,11 +34,11 @@ exports.getReservationById = async (req, res) => {
 
 exports.updateReservation = async (req, res) => {
   try {
-    const { name, from, to, people } = req.body;
+    const { name, email, from, to, people } = req.body;
 
     const updated = await Reservation.findByIdAndUpdate(
       req.params.id,
-      { name, from, to, people },
+      { name, email, from, to, people },
       { new: true }
     );
 

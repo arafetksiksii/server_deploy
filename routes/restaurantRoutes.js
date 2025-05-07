@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../middleware/upload"); // ⬅️ Import your upload middleware
 
 const {
   createRestaurant,
@@ -9,10 +10,11 @@ const {
   deleteRestaurant
 } = require("../controllers/restaurantController");
 
-router.post("/", createRestaurant);
+// Apply middleware to handle image uploads
+router.post("/", upload.single("image"), createRestaurant);
 router.get("/", getAllRestaurants);
 router.get("/:id", getRestaurantById);
-router.put("/:id", updateRestaurant);
+router.put("/:id", upload.single("image"), updateRestaurant);
 router.delete("/:id", deleteRestaurant);
 
 module.exports = router;
