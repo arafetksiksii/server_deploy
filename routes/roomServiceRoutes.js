@@ -6,7 +6,8 @@ const {
   getAllRoomServices,
   getRoomServiceById,
   updateRoomService,
-  deleteRoomService
+  deleteRoomService,
+  addMenuToRoomService
 } = require("../controllers/roomServiceController");
 
 router.post("/", createRoomService);
