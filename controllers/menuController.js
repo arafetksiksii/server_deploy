@@ -9,7 +9,7 @@ exports.createMenu = async (req, res) => {
     const image = req.file ? req.file.path : "";
     const parsedItems = items ? JSON.parse(items) : [];
 
-    const menu = new Menu({ title, items: parsedItems, image, restaurant });
+    const menu = new Menu({ title, items: parsedItems, image, restaurant, roomService });
     await menu.save();
 
     const io = req.app.get("io");

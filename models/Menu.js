@@ -14,7 +14,13 @@ const menuSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Restaurant",
     required: false
+  },
+  roomService: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "RoomService",
+    required: false
   }
 }, { timestamps: true });
+
 
 module.exports = mongoose.model("Menu", menuSchema);
