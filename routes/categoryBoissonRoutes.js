@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../middleware/upload"); // ✅ Add Multer for category
 
 const {
   createCategory,
@@ -9,11 +10,12 @@ const {
   deleteCategory
 } = require("../controllers/categoryBoissonController");
 
-// Category CRUD routes
-router.post("/", createCategory);
+// Add upload for image
+router.post("/", upload.single("image"), createCategory);
+router.put("/:id", upload.single("image"), updateCategory);
+
 router.get("/", getAllCategories);
 router.get("/:id", getCategoryById);
-router.put("/:id", updateCategory);
 router.delete("/:id", deleteCategory);
 
 module.exports = router;

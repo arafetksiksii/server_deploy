@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../middleware/upload"); // ✅ import Multer
 
 const {
   createBoisson,
@@ -10,9 +9,9 @@ const {
   deleteBoisson
 } = require("../controllers/boissonController");
 
-// ✅ Apply Multer to POST/PUT
-router.post("/", upload.single("image"), createBoisson);
-router.put("/:id", upload.single("image"), updateBoisson);
+// No more image upload needed
+router.post("/", createBoisson);
+router.put("/:id", updateBoisson);
 
 router.get("/", getAllBoissons);
 router.get("/:id", getBoissonById);

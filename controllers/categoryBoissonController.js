@@ -3,8 +3,9 @@ const CategoryBoisson = require("../models/CategoryBoisson");
 exports.createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
+    const image = req.file ? req.file.path : "";
 
-    const category = new CategoryBoisson({ name, description });
+    const category = new CategoryBoisson({ name, description, image });
     await category.save();
 
     res.status(201).json(category);
@@ -12,6 +13,7 @@ exports.createCategory = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.getAllCategories = async (req, res) => {
   try {
@@ -36,11 +38,17 @@ exports.updateCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
+    const updateFields = { name, description };
+    if (req.file) {
+      updateFields.image = req.file.path;
+    }
+
     const category = await CategoryBoisson.findByIdAndUpdate(
       req.params.id,
-      { name, description },
+      updateFields,
       { new: true }
     );
+
     if (!category) return res.status(404).json({ message: "Category not found" });
 
     res.status(200).json(category);
@@ -48,6 +56,7 @@ exports.updateCategory = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.deleteCategory = async (req, res) => {
   try {

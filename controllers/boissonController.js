@@ -2,10 +2,9 @@ const Boisson = require("../models/Boisson");
 
 exports.createBoisson = async (req, res) => {
   try {
-    const { title, price, quantity, description, category } = req.body; // Added category
-    const image = req.file ? req.file.path : "";
+    const { title, price, quantity, description, category } = req.body;
 
-    const boisson = new Boisson({ title, price, quantity, description, image, category });
+    const boisson = new Boisson({ title, price, quantity, description, category });
     await boisson.save();
 
     const io = req.app.get("io");
@@ -38,19 +37,9 @@ exports.getBoissonById = async (req, res) => {
 
 exports.updateBoisson = async (req, res) => {
   try {
-    const { title, price, quantity, description, category } = req.body; // Added category
+    const { title, price, quantity, description, category } = req.body;
 
-    const updateFields = {
-      title,
-      price,
-      quantity,
-      description,
-      category,
-    };
-
-    if (req.file) {
-      updateFields.image = req.file.path;
-    }
+    const updateFields = { title, price, quantity, description, category };
 
     const boisson = await Boisson.findByIdAndUpdate(req.params.id, updateFields, { new: true });
     if (!boisson) return res.status(404).json({ message: "Boisson not found" });
@@ -63,6 +52,7 @@ exports.updateBoisson = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.deleteBoisson = async (req, res) => {
   try {

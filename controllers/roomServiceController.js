@@ -2,9 +2,9 @@ const RoomService = require("../models/RoomService");
 
 exports.createRoomService = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, menu } = req.body;
 
-    const roomService = new RoomService({ name, description });
+    const roomService = new RoomService({ name, description, menu });
     await roomService.save();
 
     const io = req.app.get("io");
@@ -19,7 +19,7 @@ exports.createRoomService = async (req, res) => {
 
 exports.getAllRoomServices = async (req, res) => {
   try {
-    const services = await RoomService.find();
+    const services = await RoomService.find().populate("menu");
     res.status(200).json(services);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -28,7 +28,7 @@ exports.getAllRoomServices = async (req, res) => {
 
 exports.getRoomServiceById = async (req, res) => {
   try {
-    const service = await RoomService.findById(req.params.id);
+    const service = await RoomService.findById(req.params.id).populate("menu");
     if (!service) return res.status(404).json({ message: "Room Service not found" });
     res.status(200).json(service);
   } catch (err) {
@@ -38,11 +38,11 @@ exports.getRoomServiceById = async (req, res) => {
 
 exports.updateRoomService = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, menu } = req.body;
 
     const service = await RoomService.findByIdAndUpdate(
       req.params.id,
-      { name, description },
+      { name, description, menu },
       { new: true }
     );
 
