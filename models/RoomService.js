@@ -10,11 +10,12 @@ const roomServiceSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
-  menu: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Menu",
-    default: null // Optional field
-  }
+  menus: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Menu"
+    }
+  ]
 }, { timestamps: true });
 
 module.exports = mongoose.model("RoomService", roomServiceSchema);
