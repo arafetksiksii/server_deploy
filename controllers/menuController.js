@@ -5,7 +5,7 @@ const path = require("path");
 
 exports.createMenu = async (req, res) => {
   try {
-    const { title, items, restaurant } = req.body; // Added restaurant
+    const { title, items, restaurant, roomService } = req.body;
     const image = req.file ? req.file.path : "";
     const parsedItems = items ? JSON.parse(items) : [];
 
