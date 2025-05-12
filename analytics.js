@@ -6,7 +6,7 @@ require("dotenv").config()
 const router = express.Router()
 
 const analyticsDataClient = new BetaAnalyticsDataClient({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,  // Use the environment variable here
+  keyFilename: "/etc/secrets/solutionqrcode-904a0864f609.json",  // Path where Render stores the secret file
 })
 
 const PROPERTY_ID = process.env.GA4_PROPERTY_ID
