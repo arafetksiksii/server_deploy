@@ -1,18 +1,53 @@
 const Reservation = require("../models/Reservation");
 
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,     // e.g., yourapp@gmail.com
+    pass: process.env.EMAIL_PASS      // app-specific password
+  }
+});
+
+
+// CREATE
 exports.createReservation = async (req, res) => {
   try {
-    const { name, email, from, to, people } = req.body;
+    const {
+      name,
+      email,
+      from,
+      to,
+      people,
+      mail,
+      phoneNumber,
+      service,
+      serviceDetails,
+      status 
+    } = req.body;
 
-    const reservation = new Reservation({ name, email, from, to, people });
+    const reservation = new Reservation({
+      name,
+      email,
+      from,
+      to,
+      people,
+      mail,
+      phoneNumber,
+      service,
+      serviceDetails,
+      status 
+    });
+
     await reservation.save();
-
     res.status(201).json(reservation);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
+// READ ALL
 exports.getAllReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find();
@@ -22,6 +57,7 @@ exports.getAllReservations = async (req, res) => {
   }
 };
 
+// READ ONE
 exports.getReservationById = async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
@@ -32,17 +68,56 @@ exports.getReservationById = async (req, res) => {
   }
 };
 
+// UPDATE
 exports.updateReservation = async (req, res) => {
   try {
-    const { name, email, from, to, people } = req.body;
+    const {
+      name,
+      email,
+      from,
+      to,
+      people,
+      mail,
+      phoneNumber,
+      service,
+      serviceDetails,
+      status 
+    } = req.body;
 
     const updated = await Reservation.findByIdAndUpdate(
       req.params.id,
-      { name, email, from, to, people },
+      {
+        name,
+        email,
+        from,
+        to,
+        people,
+        mail,
+        phoneNumber,
+        service,
+        serviceDetails,
+        status 
+      },
       { new: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Reservation not found" });
+
+    // ✅ Send email notification
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: updated.email,
+      subject: "Mise à jour de votre réservation",
+      text: `Bonjour ${updated.name},\n\nVotre réservation est maintenant "${updated.status}" pour la date du ${new Date(updated.from).toLocaleDateString()}.\n\nMerci pour votre confiance.\nL'équipe Novotel.`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Erreur d'envoi d'email :", error);
+      } else {
+        console.log("Email envoyé :", info.response);
+      }
+    });
 
     res.status(200).json(updated);
   } catch (err) {
@@ -50,6 +125,8 @@ exports.updateReservation = async (req, res) => {
   }
 };
 
+
+// DELETE
 exports.deleteReservation = async (req, res) => {
   try {
     const deleted = await Reservation.findByIdAndDelete(req.params.id);

@@ -12,7 +12,7 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
 const PROPERTY_ID = process.env.GA4_PROPERTY_ID
 
 router.get("/views", async (req, res) => {
-  try {
+  try {index
     const [response] = await analyticsDataClient.runReport({
       property: `properties/${PROPERTY_ID}`,
       dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
