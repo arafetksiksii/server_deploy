@@ -26,8 +26,12 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
+
+    // Ensure role is an array (optional safeguard)
+    const userRoles = Array.isArray(role) ? role : [role];
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword, role });
+    const newUser = new User({ username, email, password: hashedPassword, role: userRoles });
     await newUser.save();
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
@@ -39,17 +43,22 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { username, email, role } = req.body;
+
+    const userRoles = Array.isArray(role) ? role : [role]; // ensure it's always an array
+
     const updated = await User.findByIdAndUpdate(
       req.params.id,
-      { username, email, role },
+      { username, email, role: userRoles },
       { new: true }
     ).select("-password");
+
     if (!updated) return res.status(404).json({ error: "User not found" });
     res.json(updated);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
+
 
 // Delete user
 exports.deleteUser = async (req, res) => {
@@ -67,7 +76,7 @@ exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) return res.status(405).json({ error: "User not found" });
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) return res.status(401).json({ error: "Incorrect current password" });
