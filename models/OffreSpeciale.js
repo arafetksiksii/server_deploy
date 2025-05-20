@@ -22,6 +22,10 @@ const offreSpecialeSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: true
+  },
+  image: {
+    type: String,
+    default: "" // Cloudinary URL or local path
   }
 }, { timestamps: true });
 

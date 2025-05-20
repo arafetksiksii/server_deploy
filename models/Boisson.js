@@ -22,7 +22,11 @@ const boissonSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "CategoryBoisson",
     required: true
-  }
+  },
+    image: { 
+      type: String,
+      default: "" 
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Boisson", boissonSchema);

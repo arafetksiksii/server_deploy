@@ -1,17 +1,18 @@
 const express = require("express");
-const router = express.Router();
+const upload = require("../middleware/upload"); // 👈 import your existing multer config
 
+const router = express.Router();
 const {
   createBoisson,
   getAllBoissons,
   getBoissonById,
   updateBoisson,
-  deleteBoisson
+  deleteBoisson,
 } = require("../controllers/boissonController");
 
-// No more image upload needed
-router.post("/", createBoisson);
-router.put("/:id", updateBoisson);
+// 🧠 Apply upload middleware to support image uploads
+router.post("/", upload.single("image"), createBoisson);
+router.put("/:id", upload.single("image"), updateBoisson);
 
 router.get("/", getAllBoissons);
 router.get("/:id", getBoissonById);
