@@ -27,6 +27,7 @@ exports.createReservation = async (req, res) => {
       status 
     } = req.body;
 
+    // Create reservation
     const reservation = new Reservation({
       name,
       email,
@@ -41,11 +42,23 @@ exports.createReservation = async (req, res) => {
     });
 
     await reservation.save();
+
+    // Create notification
+    const description = `A new reservation was made by ${reservation.name} for ${reservation.service} at ${new Date(reservation.to).toLocaleString()}.`;
+
+    const notification = new Notification({
+      description,
+      service: reservation.service
+    });
+
+    await notification.save();
+
     res.status(201).json(reservation);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // READ ALL
 exports.getAllReservations = async (req, res) => {
