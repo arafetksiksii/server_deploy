@@ -77,12 +77,8 @@ app.use("/api/room-services", roomServiceRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/analytics", analyticsRoutes)
-app.use("/notifications", notificationRoutes);
-// Protected route example
-const authenticateToken = require("./middleware/authMiddleware");
-app.get("/api/protected", authenticateToken, (req, res) => {
-  res.json({ message: "This is protected data", user: req.user });
-});
+app.use("/api/notifications", notificationRoutes);
+
 
 // Socket.IO connection handler
 io.on("connection", (socket) => {
