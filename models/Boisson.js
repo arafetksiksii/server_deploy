@@ -12,7 +12,7 @@ const boissonSchema = new mongoose.Schema({
   },
   quantity: {
     type: Number,
-    required: true
+    required: false
   },
   description: {
     type: String,

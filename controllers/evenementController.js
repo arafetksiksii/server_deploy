@@ -2,10 +2,10 @@ const Evenement = require("../models/Evenement");
 
 exports.createEvenement = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, price } = req.body; // ✅ include price
     const image = req.file ? req.file.path : "";
 
-    const evenement = new Evenement({ name, description, image });
+    const evenement = new Evenement({ name, description, price, image }); // ✅ add price here
     await evenement.save();
 
     const io = req.app.get("io");
@@ -17,7 +17,6 @@ exports.createEvenement = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 exports.getAllEvenements = async (req, res) => {
   try {
     const evenements = await Evenement.find();
@@ -39,8 +38,8 @@ exports.getEvenementById = async (req, res) => {
 
 exports.updateEvenement = async (req, res) => {
   try {
-    const { name, description } = req.body;
-    const updateFields = { name, description };
+    const { name, description, price } = req.body; // ✅ include price
+    const updateFields = { name, description, price }; // ✅ include price
 
     if (req.file) {
       updateFields.image = req.file.path;
