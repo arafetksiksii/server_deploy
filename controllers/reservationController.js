@@ -1,4 +1,5 @@
 const Reservation = require("../models/Reservation");
+const Notification = require("../models/Notification");
 
 const nodemailer = require("nodemailer");
 
