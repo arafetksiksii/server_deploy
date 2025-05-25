@@ -44,7 +44,7 @@ exports.createReservation = async (req, res) => {
     await reservation.save();
 
     // Create notification
-    const description = `A new reservation was made by ${reservation.name} for ${reservation.service} at ${new Date(reservation.to).toLocaleString()}.`;
+    const description = `Une nouvelle réservation a été effectuée par ${reservation.name} pour ${reservation.service} à ${new Date(reservation.to).toLocaleString()}.`;
 
     const notification = new Notification({
       description,
