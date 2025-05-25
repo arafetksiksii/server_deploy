@@ -2,10 +2,17 @@ const Loisir = require("../models/Loisir");
 
 exports.createLoisir = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, ouverture, fermeture } = req.body;
     const image = req.file ? req.file.path : "";
 
-    const loisir = new Loisir({ name, description, image });
+    const loisir = new Loisir({
+      name,
+      description,
+      image,
+      ouverture: ouverture ? new Date(ouverture) : null,
+      fermeture: fermeture ? new Date(fermeture) : null
+    });
+
     await loisir.save();
 
     const io = req.app.get("io");
@@ -39,8 +46,14 @@ exports.getLoisirById = async (req, res) => {
 
 exports.updateLoisir = async (req, res) => {
   try {
-    const { name, description } = req.body;
-    const updateFields = { name, description };
+    const { name, description, ouverture, fermeture } = req.body;
+
+    const updateFields = {
+      name,
+      description,
+      ouverture: ouverture ? new Date(ouverture) : null,
+      fermeture: fermeture ? new Date(fermeture) : null
+    };
 
     if (req.file) {
       updateFields.image = req.file.path;
@@ -58,6 +71,7 @@ exports.updateLoisir = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.deleteLoisir = async (req, res) => {
   try {

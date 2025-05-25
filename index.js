@@ -59,6 +59,7 @@ const reservationRoutes = require("./routes/reservationRoutes");
 const userRoutes = require("./routes/userRoutes");
 const analyticsRoutes = require("./analytics")
 const notificationRoutes = require("./routes/notificationRoutes");
+const nettoyageRoutes = require("./routes/nettoyageRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
@@ -78,6 +79,7 @@ app.use("/api/reservations", reservationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/analytics", analyticsRoutes)
 app.use("/api/notifications", notificationRoutes);
+app.use("/nettoyages", nettoyageRoutes);
 // Protected route example
 const authenticateToken = require("./middleware/authMiddleware");
 app.get("/api/protected", authenticateToken, (req, res) => {
