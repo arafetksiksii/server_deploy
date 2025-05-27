@@ -24,6 +24,7 @@ exports.createReservation = async (req, res) => {
       phoneNumber,
       service,
       serviceDetails,
+      room,
       status 
     } = req.body;
 
@@ -38,13 +39,14 @@ exports.createReservation = async (req, res) => {
       phoneNumber,
       service,
       serviceDetails,
+      room,
       status 
     });
 
     await reservation.save();
 
     // Create notification
-    const description = `Une nouvelle réservation a été effectuée par ${reservation.name} pour ${reservation.service} à ${new Date(reservation.to).toLocaleString()}.`;
+    const description = `Une nouvelle réservation a été effectuée par ${reservation.name} pour ${reservation.service} à ${new Date(reservation.to).toLocaleString()} room : ${reservation.room} .`;
 
     const notification = new Notification({
       description,
@@ -94,7 +96,8 @@ exports.updateReservation = async (req, res) => {
       phoneNumber,
       service,
       serviceDetails,
-      status 
+      room,
+      status
     } = req.body;
 
     const updated = await Reservation.findByIdAndUpdate(
@@ -109,6 +112,7 @@ exports.updateReservation = async (req, res) => {
         phoneNumber,
         service,
         serviceDetails,
+        room,
         status 
       },
       { new: true }
@@ -121,7 +125,7 @@ exports.updateReservation = async (req, res) => {
       from: process.env.EMAIL_USER,
       to: updated.email,
       subject: "Mise à jour de votre réservation",
-      text: `Bonjour ${updated.name},\n\nVotre réservation est maintenant "${updated.status}" pour la date du ${new Date(updated.from).toLocaleDateString()}.\n\nMerci pour votre confiance.\nL'équipe Novotel.`
+      text: `Bonjour ${updated.name},\n\nVotre réservation est maintenant "${updated.status}" pour la date du ${new Date(updated.from).toLocaleDateString()}.\n\nMerci pour votre confiance.\nL'équipe Novotel. room ${updated.room} `
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
