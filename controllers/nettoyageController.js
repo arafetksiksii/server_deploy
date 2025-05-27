@@ -35,7 +35,6 @@ exports.createNettoyage = async (req, res) => {
   }
 };
 
-s
 exports.getAllNettoyages = async (req, res) => {
   try {
     const nettoyages = await Nettoyage.find();
