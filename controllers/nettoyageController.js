@@ -1,4 +1,6 @@
 const Nettoyage = require("../models/Nettoyage");
+const RoomServiceOrder = require("../models/RoomServiceOrder"); // import this
+
 
 exports.createNettoyage = async (req, res) => {
   try {
@@ -13,13 +15,27 @@ exports.createNettoyage = async (req, res) => {
 
     await nettoyage.save();
 
-    res.status(201).json(nettoyage);
+    // Automatically create a linked RoomServiceOrder
+    const roomServiceOrder = new RoomServiceOrder({
+      name,
+      room,
+      service: "Nettoyage",
+      serviceDetails: `Cleaning scheduled from ${new Date(disponibleDe).toLocaleString()} to ${new Date(disponibleA).toLocaleString()}`
+    });
+
+    await roomServiceOrder.save();
+
+    res.status(201).json({
+      nettoyage,
+      roomServiceOrder
+    });
   } catch (err) {
-    console.error("❌ Error creating nettoyage:", err.message);
+    console.error("❌ Error creating nettoyage and room service:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
 
+s
 exports.getAllNettoyages = async (req, res) => {
   try {
     const nettoyages = await Nettoyage.find();
