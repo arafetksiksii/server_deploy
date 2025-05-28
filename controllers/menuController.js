@@ -6,10 +6,20 @@ const path = require("path");
 exports.createMenu = async (req, res) => {
   try {
     const { title, items, restaurant, roomService, skyLounge } = req.body;
-    const image = req.file ? req.file.path : "";
     const parsedItems = items ? JSON.parse(items) : [];
 
-    const menu = new Menu({ title, items: parsedItems, image, restaurant, roomService, skyLounge });
+    // Map uploaded images to their file paths (Cloudinary returns them in .path)
+    const images = req.files ? req.files.map(file => file.path) : [];
+
+    const menu = new Menu({
+      title,
+      items: parsedItems,
+      images,
+      restaurant,
+      roomService,
+      skyLounge
+    });
+
     await menu.save();
 
     const io = req.app.get("io");
@@ -21,6 +31,7 @@ exports.createMenu = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.getAllMenus = async (req, res) => {
   try {
@@ -54,8 +65,9 @@ exports.updateMenu = async (req, res) => {
       skyLounge
     };
 
-    if (req.file) {
-      updateFields.image = req.file.path;
+    // If new images were uploaded, replace existing images
+    if (req.files && req.files.length > 0) {
+      updateFields.images = req.files.map(file => file.path);
     }
 
     const menu = await Menu.findByIdAndUpdate(req.params.id, updateFields, { new: true });
@@ -70,6 +82,7 @@ exports.updateMenu = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 exports.deleteMenu = async (req, res) => {

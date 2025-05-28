@@ -8,7 +8,10 @@ const itemSchema = new mongoose.Schema({
 
 const menuSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  image: String,
+  images: {
+    type: [String], // change from a single image to an array of image paths
+    default: []
+  },
   items: [itemSchema],
   restaurant: { 
     type: mongoose.Schema.Types.ObjectId,

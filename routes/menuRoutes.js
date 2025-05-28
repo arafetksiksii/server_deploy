@@ -11,10 +11,10 @@ const {
   downloadMenuPDF
 } = require("../controllers/menuController");
 
-router.post("/", upload.single("image"), createMenu);
+router.post("/", upload.array("images", 5), createMenu);
 router.get("/", getAllMenus);
 router.get("/:id", getMenuById);
-router.put("/:id", upload.single("image"), updateMenu);
+router.put("/:id", upload.array("images", 5), updateMenu);
 router.delete("/:id", deleteMenu);
 router.get("/:id/pdf", downloadMenuPDF);
 
