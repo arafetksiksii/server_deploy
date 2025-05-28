@@ -2,9 +2,9 @@ const RoomServiceOrder = require("../models/RoomServiceOrder");
 
 exports.createRoomServiceOrder = async (req, res) => {
   try {
-    const { name, room, service, serviceDetails } = req.body;
+    const { name, room, service, serviceDetails, status } = req.body;
 
-    const order = new RoomServiceOrder({ name, room, service, serviceDetails });
+    const order = new RoomServiceOrder({ name, room, service, serviceDetails, status });
     await order.save();
 
     res.status(201).json(order);
@@ -36,13 +36,14 @@ exports.getRoomServiceOrderById = async (req, res) => {
 
 exports.updateRoomServiceOrder = async (req, res) => {
   try {
-    const { name, room, service, serviceDetails } = req.body;
+    const { name, room, service, serviceDetails, status } = req.body;
 
     const updatedFields = {
       name,
       room,
       service,
-      serviceDetails
+      serviceDetails,
+      status
     };
 
     const order = await RoomServiceOrder.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
