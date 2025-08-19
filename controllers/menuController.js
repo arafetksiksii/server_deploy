@@ -19,6 +19,7 @@ exports.createMenu = async (req, res) => {
       roomService,
       skyLounge
     });
+console.log("Parsed items:", parsedItems);
 
     await menu.save();
 
