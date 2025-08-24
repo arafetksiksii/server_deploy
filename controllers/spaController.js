@@ -1,11 +1,15 @@
 const Spa = require("../models/Spa");
 
+// ✅ Create Spa (with categories)
 exports.createSpa = async (req, res) => {
   try {
-    const { name, description } = req.body;
-    const image = req.file ? req.file.path : "";
+    const { categories } = req.body;
 
-    const spa = new Spa({ name, description, image });
+    if (!categories || !Array.isArray(categories)) {
+      return res.status(400).json({ message: "Categories are required and must be an array" });
+    }
+
+    const spa = new Spa({ categories });
     await spa.save();
 
     const io = req.app.get("io");
@@ -18,6 +22,7 @@ exports.createSpa = async (req, res) => {
   }
 };
 
+// ✅ Get all Spa documents
 exports.getAllSpas = async (req, res) => {
   try {
     const spas = await Spa.find();
@@ -27,6 +32,7 @@ exports.getAllSpas = async (req, res) => {
   }
 };
 
+// ✅ Get Spa by ID
 exports.getSpaById = async (req, res) => {
   try {
     const spa = await Spa.findById(req.params.id);
@@ -37,16 +43,21 @@ exports.getSpaById = async (req, res) => {
   }
 };
 
+// ✅ Update Spa (replace categories)
 exports.updateSpa = async (req, res) => {
   try {
-    const { name, description } = req.body;
-    const updateFields = { name, description };
+    const { categories } = req.body;
 
-    if (req.file) {
-      updateFields.image = req.file.path;
+    if (!categories || !Array.isArray(categories)) {
+      return res.status(400).json({ message: "Categories are required and must be an array" });
     }
 
-    const spa = await Spa.findByIdAndUpdate(req.params.id, updateFields, { new: true });
+    const spa = await Spa.findByIdAndUpdate(
+      req.params.id,
+      { categories },
+      { new: true }
+    );
+
     if (!spa) return res.status(404).json({ message: "Spa not found" });
 
     const io = req.app.get("io");
@@ -59,6 +70,7 @@ exports.updateSpa = async (req, res) => {
   }
 };
 
+// ✅ Delete Spa
 exports.deleteSpa = async (req, res) => {
   try {
     const spa = await Spa.findByIdAndDelete(req.params.id);

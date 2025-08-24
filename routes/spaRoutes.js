@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../middleware/upload");
 
 const {
   createSpa,
@@ -10,10 +9,19 @@ const {
   deleteSpa
 } = require("../controllers/spaController");
 
-router.post("/", upload.single("image"), createSpa);
+// ✅ Create a Spa (categories only)
+router.post("/", createSpa);
+
+// ✅ Get all Spas
 router.get("/", getAllSpas);
+
+// ✅ Get Spa by ID
 router.get("/:id", getSpaById);
-router.put("/:id", upload.single("image"), updateSpa);
+
+// ✅ Update Spa (replace categories)
+router.put("/:id", updateSpa);
+
+// ✅ Delete Spa
 router.delete("/:id", deleteSpa);
 
 module.exports = router;
