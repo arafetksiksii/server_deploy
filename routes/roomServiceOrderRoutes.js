@@ -7,6 +7,6 @@ router.get("/", roomServiceOrderController.getAllRoomServiceOrders);
 router.get("/:id", roomServiceOrderController.getRoomServiceOrderById);
 router.put("/:id", roomServiceOrderController.updateRoomServiceOrder);
 router.delete("/:id", roomServiceOrderController.deleteRoomServiceOrder);
-router.get("/confirm/:id", controller.confirmRoomServiceOrder);
+router.get("/confirm/:id", roomServiceOrderController.confirmRoomServiceOrder);
 
 module.exports = router;
