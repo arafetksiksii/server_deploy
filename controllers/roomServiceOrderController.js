@@ -61,7 +61,7 @@ exports.createRoomServiceOrder = async (req, res) => {
     await order.save();
 
     // Generate confirmation URL
-    const confirmUrl = `${req.protocol}://${req.get("host")}/api/room-service-orders/confirm/${order._id}`;
+    const confirmUrl = `${req.protocol}://${req.get("host")}/api/roomservice-orders/confirm/${order._id}`;
 
     // Send confirmation email
     await transporter.sendMail({
