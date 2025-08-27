@@ -15,7 +15,7 @@ function generateConfirmationEmail(order, confirmUrl) {
   return `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
     <div style="text-align: center;">
-      <img src="https://seeklogo.com/images/N/novotel-logo-7F34F44CF9-seeklogo.com.png" alt="Novotel Logo" style="width: 150px;"/>
+      <img src="https://novoteltorontocentre.com/wp-content/themes/novotel/assets/img/novotel-monogram.png" alt="Novotel Logo" style="width: 150px;"/>
       <h2 style="color: #003366;">Confirmation de votre commande Room Service</h2>
     </div>
     <p>Bonjour <b>${order.name}</b>,</p>
