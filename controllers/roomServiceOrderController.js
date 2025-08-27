@@ -100,15 +100,17 @@ exports.confirmRoomServiceOrder = async (req, res) => {
   }
 };
 
-// ✅ Get all orders
+// ✅ Get all validated orders
 exports.getAllRoomServiceOrders = async (req, res) => {
   try {
-    const orders = await RoomServiceOrder.find();
+    const orders = await RoomServiceOrder.find({ isValidated: true }); // ✅ only validated
     res.status(200).json(orders);
   } catch (err) {
+    console.error("❌ Error fetching orders:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // ✅ Get order by ID
 exports.getRoomServiceOrderById = async (req, res) => {
