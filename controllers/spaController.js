@@ -3,13 +3,16 @@ const Spa = require("../models/Spa");
 // ✅ Create Spa (with categories)
 exports.createSpa = async (req, res) => {
   try {
-    const { categories } = req.body;
+    const { categories, reservable } = req.body;
 
     if (!categories || !Array.isArray(categories)) {
       return res.status(400).json({ message: "Categories are required and must be an array" });
     }
 
-    const spa = new Spa({ categories });
+    const spa = new Spa({ 
+      categories,
+      reservable: reservable !== undefined ? reservable : true
+    });
     await spa.save();
 
     const io = req.app.get("io");
@@ -46,15 +49,18 @@ exports.getSpaById = async (req, res) => {
 // ✅ Update Spa (replace categories)
 exports.updateSpa = async (req, res) => {
   try {
-    const { categories } = req.body;
+    const { categories, reservable } = req.body;
 
     if (!categories || !Array.isArray(categories)) {
       return res.status(400).json({ message: "Categories are required and must be an array" });
     }
 
+    const updateFields = { categories };
+    if (reservable !== undefined) updateFields.reservable = reservable;
+
     const spa = await Spa.findByIdAndUpdate(
       req.params.id,
-      { categories },
+      updateFields,
       { new: true }
     );
 

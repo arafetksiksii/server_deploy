@@ -5,19 +5,20 @@ const spaServiceSchema = new mongoose.Schema({
   description: { type: String, default: "" },           // e.g. "Gommage / Scrub + ..."
   duration: { type: String, default: "" },              // e.g. "90mn" or "1H25"
   prices: {
-    TND: { type: Number, required: true },              // local currency
-    EUR: { type: Number, required: true }               // second currency
+    TND: { type: Number, required: true },             // local currency
+    EUR: { type: Number, required: true }              // second currency
   }
 });
 
 const spaCategorySchema = new mongoose.Schema({
-  title: { type: String, required: true, trim: true },   // e.g. "FORFAITS / PACKAGE"
+  title: { type: String, required: true, trim: true },  // e.g. "FORFAITS / PACKAGE"
   services: [spaServiceSchema]
 });
 
 const spaSchema = new mongoose.Schema(
   {
-    categories: [spaCategorySchema]
+    categories: [spaCategorySchema],
+    reservable: { type: Boolean, default: true } // true = users can reserve
   },
   { timestamps: true }
 );

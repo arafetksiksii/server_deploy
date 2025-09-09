@@ -9,7 +9,11 @@ const skyLoungeSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Menu"
     }
-  ]
+  ],
+  reservable: {
+    type: Boolean,
+    default: true // true means users can reserve by default
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("SkyLounge", skyLoungeSchema);

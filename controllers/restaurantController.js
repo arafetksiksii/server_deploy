@@ -2,10 +2,15 @@ const Restaurant = require("../models/Restaurant");
 
 exports.createRestaurant = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, reservable } = req.body;
     const image = req.file ? req.file.path : "";
 
-    const restaurant = new Restaurant({ name, description, image });
+    const restaurant = new Restaurant({ 
+      name, 
+      description, 
+      image, 
+      reservable: reservable !== undefined ? reservable : true // default true
+    });
     await restaurant.save();
 
     const io = req.app.get("io");
@@ -39,11 +44,15 @@ exports.getRestaurantById = async (req, res) => {
 
 exports.updateRestaurant = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, reservable } = req.body;
     const updateFields = { name, description };
 
     if (req.file) {
       updateFields.image = req.file.path;
+    }
+
+    if (reservable !== undefined) {
+      updateFields.reservable = reservable;
     }
 
     const restaurant = await Restaurant.findByIdAndUpdate(

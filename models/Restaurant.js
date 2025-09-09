@@ -14,6 +14,10 @@ const restaurantSchema = new mongoose.Schema({
   image: {
     type: String,
     default: ""
+  },
+  reservable: {
+    type: Boolean,
+    default: true // true means users can reserve by default
   }
 }, { timestamps: true });
 

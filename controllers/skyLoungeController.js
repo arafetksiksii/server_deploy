@@ -2,10 +2,15 @@ const SkyLounge = require("../models/SkyLounge");
 
 exports.createSkyLounge = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, reservable } = req.body;
     const image = req.file ? req.file.path : "";
 
-    const skyLounge = new SkyLounge({ name, description, image });
+    const skyLounge = new SkyLounge({ 
+      name, 
+      description, 
+      image, 
+      reservable: reservable !== undefined ? reservable : true
+    });
     await skyLounge.save();
 
     const io = req.app.get("io");
@@ -39,12 +44,11 @@ exports.getSkyLoungeById = async (req, res) => {
 
 exports.updateSkyLounge = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, reservable } = req.body;
     const updateFields = { name, description };
 
-    if (req.file) {
-      updateFields.image = req.file.path;
-    }
+    if (req.file) updateFields.image = req.file.path;
+    if (reservable !== undefined) updateFields.reservable = reservable;
 
     const skyLounge = await SkyLounge.findByIdAndUpdate(req.params.id, updateFields, { new: true });
     if (!skyLounge) return res.status(404).json({ message: "Sky Lounge not found" });
@@ -72,6 +76,7 @@ exports.deleteSkyLounge = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 exports.addMenuToSkyLounge = async (req, res) => {
   try {
     const { menuId } = req.body;
