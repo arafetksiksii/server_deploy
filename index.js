@@ -10,11 +10,17 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://itbafa.com", "http://localhost:3000"],
+    origin: [
+      "https://itbafa.com",
+      "http://localhost:3000",
+      "https://novotel-tunis.com",
+      "https://www.novotel-tunis.com"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
 });
+
 
 // Expose io globally so controllers can access it
 app.set("io", io);
@@ -33,10 +39,16 @@ process.on("unhandledRejection", (reason, promise) => {
 
 // Middleware
 app.use(cors({
-  origin: ["https://itbafa.com", "http://localhost:3000"],
+  origin: [
+    "https://itbafa.com", 
+    "http://localhost:3000", 
+    "https://novotel-tunis.com", 
+    "https://www.novotel-tunis.com"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
