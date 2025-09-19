@@ -8,7 +8,24 @@ const itemSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // default is non-vegetarian unless specified
   },
+  isOrganic: {
+    type: Boolean,
+    default: false, // default is not organic
+  },
+  isLocal: {
+    type: Boolean,
+    default: false, // default is not local
+  },
+  isGlutenFree: {
+    type: Boolean,
+    default: false, // default is not gluten-free
+  },
+  isLactoseFree: {
+    type: Boolean,
+    default: false, // default is not lactose-free
+  },
 });
+
 
 const menuSchema = new mongoose.Schema({
   title: { type: String, required: true },
