@@ -38,7 +38,7 @@ exports.createMenu = async (req, res) => {
       images,
       restaurant,
       roomService,
-      skylounge
+      skyLounge: skylounge // ✅ map to schema field
     });
 
     await menu.save();
