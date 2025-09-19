@@ -5,11 +5,32 @@ const path = require("path");
 
 exports.createMenu = async (req, res) => {
   try {
-    const { title, items, restaurant, roomService, skyLounge } = req.body;
-    const parsedItems = items ? JSON.parse(items) : [];
+    // Log the full request body
+    console.log("📥 Incoming request body:", req.body);
 
-    // Map uploaded images to their file paths (Cloudinary returns them in .path)
+    // Log the uploaded files, if any
+    if (req.files) {
+      console.log("📁 Uploaded files:", req.files);
+    } else {
+      console.log("📁 No files uploaded");
+    }
+
+    const { title, items, restaurant, roomService, skyLounge } = req.body;
+
+    // Parse items if sent as JSON string
+    let parsedItems = [];
+    if (items) {
+      try {
+        parsedItems = JSON.parse(items);
+        console.log("✅ Parsed items:", parsedItems);
+      } catch (parseErr) {
+        console.error("❌ Failed to parse items:", parseErr.message);
+      }
+    }
+
+    // Map uploaded images to file paths
     const images = req.files ? req.files.map(file => file.path) : [];
+    console.log("🖼 Images paths:", images);
 
     const menu = new Menu({
       title,
@@ -19,12 +40,13 @@ exports.createMenu = async (req, res) => {
       roomService,
       skyLounge
     });
-console.log("Parsed items:", parsedItems);
 
     await menu.save();
 
     const io = req.app.get("io");
     io.emit("menuCreated", menu);
+
+    console.log("🎉 Menu saved successfully:", menu);
 
     res.status(201).json(menu);
   } catch (err) {
@@ -32,6 +54,7 @@ console.log("Parsed items:", parsedItems);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 exports.getAllMenus = async (req, res) => {
