@@ -15,7 +15,7 @@ exports.createMenu = async (req, res) => {
       console.log("📁 No files uploaded");
     }
 
-    const { title, items, restaurant, roomService, skylounge } = req.body;
+    const { title, items, restaurant, roomService, skyLounge } = req.body;
 
     // Parse items if sent as JSON string
     let parsedItems = [];
@@ -38,7 +38,7 @@ exports.createMenu = async (req, res) => {
       images,
       restaurant,
       roomService,
-      skyLounge: skylounge // ✅ map to schema field
+      skyLounge
     });
 
     await menu.save();
