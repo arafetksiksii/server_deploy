@@ -25,8 +25,7 @@ router.put("/:id", updateSpa);
 // ✅ Delete Spa
 router.delete("/:id", deleteSpa);
 
-// ✅ Toggle reservable boolean
-router.patch("/:id/toggle-reservable", toggleSpaReservable);
+
 
 
 

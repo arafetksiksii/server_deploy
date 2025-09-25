@@ -1,18 +1,24 @@
 const Spa = require("../models/Spa");
 
-// ✅ Create Spa (with categories)
+// ✅ Create Spa (with categories and service reservable)
 exports.createSpa = async (req, res) => {
   try {
-    const { categories, reservable } = req.body;
+    const { categories } = req.body;
 
     if (!categories || !Array.isArray(categories)) {
       return res.status(400).json({ message: "Categories are required and must be an array" });
     }
 
-    const spa = new Spa({ 
-      categories,
-      reservable: reservable !== undefined ? reservable : true
+    // Ensure each service has a reservable boolean
+    categories.forEach(category => {
+      if (Array.isArray(category.services)) {
+        category.services.forEach(service => {
+          if (service.reservable === undefined) service.reservable = true;
+        });
+      }
     });
+
+    const spa = new Spa({ categories });
     await spa.save();
 
     const io = req.app.get("io");
@@ -49,18 +55,24 @@ exports.getSpaById = async (req, res) => {
 // ✅ Update Spa (replace categories)
 exports.updateSpa = async (req, res) => {
   try {
-    const { categories, reservable } = req.body;
+    const { categories } = req.body;
 
     if (!categories || !Array.isArray(categories)) {
       return res.status(400).json({ message: "Categories are required and must be an array" });
     }
 
-    const updateFields = { categories };
-    if (reservable !== undefined) updateFields.reservable = reservable;
+    // Ensure each service has a reservable boolean
+    categories.forEach(category => {
+      if (Array.isArray(category.services)) {
+        category.services.forEach(service => {
+          if (service.reservable === undefined) service.reservable = true;
+        });
+      }
+    });
 
     const spa = await Spa.findByIdAndUpdate(
       req.params.id,
-      updateFields,
+      { categories },
       { new: true }
     );
 
@@ -91,24 +103,3 @@ exports.deleteSpa = async (req, res) => {
   }
 };
 
-// ✅ Toggle reservable boolean
-exports.toggleSpaReservable = async (req, res) => {
-  try {
-    const spa = await Spa.findById(req.params.id);
-    if (!spa) return res.status(404).json({ message: "Spa not found" });
-
-    spa.reservable = !spa.reservable; // toggle
-    await spa.save();
-
-    const io = req.app.get("io");
-    io.emit("spaUpdated", spa); // emit update to clients
-
-    res.status(200).json({
-      message: "Spa reservable status updated",
-      reservable: spa.reservable
-    });
-  } catch (err) {
-    console.error("❌ Error toggling spa reservable:", err.message);
-    res.status(500).json({ message: err.message });
-  }
-};

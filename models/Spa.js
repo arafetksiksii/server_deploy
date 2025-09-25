@@ -7,7 +7,8 @@ const spaServiceSchema = new mongoose.Schema({
   prices: {
     TND: { type: Number, required: true },             // local currency
     EUR: { type: Number, required: true }              // second currency
-  }
+  },
+  reservable: { type: Boolean, default: true }          // moved here per service
 });
 
 const spaCategorySchema = new mongoose.Schema({
@@ -17,8 +18,7 @@ const spaCategorySchema = new mongoose.Schema({
 
 const spaSchema = new mongoose.Schema(
   {
-    categories: [spaCategorySchema],
-    reservable: { type: Boolean, default: true } // true = users can reserve
+    categories: [spaCategorySchema]
   },
   { timestamps: true }
 );
