@@ -24,6 +24,10 @@ const itemSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // default is not lactose-free
   },
+    commandable: {
+    type: Boolean,
+    default: true, // default is commandable
+  },
 });
 
 
