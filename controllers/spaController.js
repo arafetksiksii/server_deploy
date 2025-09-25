@@ -90,3 +90,25 @@ exports.deleteSpa = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// ✅ Toggle reservable boolean
+exports.toggleSpaReservable = async (req, res) => {
+  try {
+    const spa = await Spa.findById(req.params.id);
+    if (!spa) return res.status(404).json({ message: "Spa not found" });
+
+    spa.reservable = !spa.reservable; // toggle
+    await spa.save();
+
+    const io = req.app.get("io");
+    io.emit("spaUpdated", spa); // emit update to clients
+
+    res.status(200).json({
+      message: "Spa reservable status updated",
+      reservable: spa.reservable
+    });
+  } catch (err) {
+    console.error("❌ Error toggling spa reservable:", err.message);
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -6,7 +6,8 @@ const {
   getAllSpas,
   getSpaById,
   updateSpa,
-  deleteSpa
+  deleteSpa,
+  toggleSpaReservable
 } = require("../controllers/spaController");
 
 // ✅ Create a Spa (categories only)
@@ -23,5 +24,10 @@ router.put("/:id", updateSpa);
 
 // ✅ Delete Spa
 router.delete("/:id", deleteSpa);
+
+// ✅ Toggle reservable boolean
+router.patch("/:id/toggle-reservable", toggleSpaReservable);
+
+
 
 module.exports = router;
