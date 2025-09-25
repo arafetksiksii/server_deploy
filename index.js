@@ -73,6 +73,7 @@ const analyticsRoutes = require("./analytics")
 const notificationRoutes = require("./routes/notificationRoutes");
 const nettoyageRoutes = require("./routes/nettoyageRoutes");
 const roomServiceOrderRoutes = require("./routes/roomServiceOrderRoutes");
+const pageContentRoutes = require("./routes/pageContentRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
@@ -94,6 +95,7 @@ app.use("/api/analytics", analyticsRoutes)
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/nettoyages", nettoyageRoutes);
 app.use("/api/roomservice-orders", roomServiceOrderRoutes);
+app.use("/api/page-contents", pageContentRoutes);
 // Protected route example
 const authenticateToken = require("./middleware/authMiddleware");
 app.get("/api/protected", authenticateToken, (req, res) => {
