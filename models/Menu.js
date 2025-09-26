@@ -24,6 +24,10 @@ const itemSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // default is not lactose-free
   },
+    isAvailable24_7: {
+    type: Boolean,
+    default: false, // default is not available 24/7
+  },
     commandable: {
     type: Boolean,
     default: true, // default is commandable
