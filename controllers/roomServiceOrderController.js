@@ -45,9 +45,12 @@ function generateConfirmationEmail(order, confirmUrl) {
 
 // ✅ Create Order + Send confirmation email
 exports.createRoomServiceOrder = async (req, res) => {
+  console.log("📝 Incoming Room Service Order request:", req.body);
+
   try {
     const { name, email, room, service, serviceDetails, status, time } = req.body;
 
+    console.log("📦 Creating RoomServiceOrder object...");
     const order = new RoomServiceOrder({
       name,
       email,
@@ -58,25 +61,30 @@ exports.createRoomServiceOrder = async (req, res) => {
       time,
       isValidated: false,
     });
+
+    console.log("💾 Saving order to database...");
     await order.save();
+    console.log("✅ Order saved successfully with ID:", order._id);
 
     // Generate confirmation URL
     const confirmUrl = `${req.protocol}://${req.get("host")}/api/roomservice-orders/confirm/${order._id}`;
+    console.log("🔗 Generated confirmation URL:", confirmUrl);
 
-    // Send confirmation email
+    console.log("✉️ Sending confirmation email to:", email);
     await transporter.sendMail({
       from: `"Novotel Tunis" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Confirmation de votre commande Room Service - Novotel Tunis",
       html: generateConfirmationEmail(order, confirmUrl),
     });
+    console.log("✅ Confirmation email sent successfully.");
 
     res.status(201).json({
       message: "Commande créée avec succès. Un email de confirmation a été envoyé.",
       order,
     });
   } catch (err) {
-    console.error("❌ Error creating order:", err.message);
+    console.error("❌ Error creating order:", err);
     res.status(500).json({ message: err.message });
   }
 };
