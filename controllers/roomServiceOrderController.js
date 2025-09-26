@@ -3,12 +3,24 @@ const nodemailer = require("nodemailer");
 
 // 📧 Setup Nodemailer transporter (replace with your SMTP or Gmail credentials)
 const transporter = nodemailer.createTransport({
-  service: "gmail", // or use: host, port, secure
+  service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER, // your email
-    pass: process.env.EMAIL_PASS, // your email password or app password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS, // App password
   },
+  logger: true,       // Logs SMTP communication
+  debug: true,        // More verbose output
 });
+
+// Verify connection before sending email
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("🚨 SMTP verification failed:", error);
+  } else {
+    console.log("✅ SMTP connection is ready:", success);
+  }
+});
+
 
 // 📧 Generate confirmation email HTML
 function generateConfirmationEmail(order, confirmUrl) {
@@ -70,14 +82,19 @@ exports.createRoomServiceOrder = async (req, res) => {
     const confirmUrl = `${req.protocol}://${req.get("host")}/api/roomservice-orders/confirm/${order._id}`;
     console.log("🔗 Generated confirmation URL:", confirmUrl);
 
-    console.log("✉️ Sending confirmation email to:", email);
-    await transporter.sendMail({
-      from: `"Novotel Tunis" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Confirmation de votre commande Room Service - Novotel Tunis",
-      html: generateConfirmationEmail(order, confirmUrl),
-    });
-    console.log("✅ Confirmation email sent successfully.");
+console.log("✉️ Sending confirmation email...");
+try {
+  const info = await transporter.sendMail({
+    from: `"Novotel Tunis" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Confirmation de votre commande Room Service - Novotel Tunis",
+    html: generateConfirmationEmail(order, confirmUrl),
+  });
+  console.log("✅ Email sent:", info);
+} catch (emailErr) {
+  console.error("🚨 Email send failed:", emailErr);
+}
+
 
     res.status(201).json({
       message: "Commande créée avec succès. Un email de confirmation a été envoyé.",
