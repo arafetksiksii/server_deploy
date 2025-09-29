@@ -12,7 +12,10 @@ const sftpConfig = {
   password: process.env.OVH_PASS,
 };
 
-// Local tmp folder for Vercel
+// Public base URL for your uploads (adjust to your domain)
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "https://novotef.com/uploads/events";
+
+// Local tmp folder (needed for Vercel/OVH)
 const localTmp = path.join("/tmp", "uploads");
 if (!fs.existsSync(localTmp)) {
   fs.mkdirSync(localTmp, { recursive: true });
@@ -28,7 +31,6 @@ const upload = multer({ storage });
 
 // --- Override .single() ---
 const originalSingle = upload.single.bind(upload);
-
 upload.single = function (fieldName) {
   const middleware = originalSingle(fieldName);
 
@@ -42,15 +44,18 @@ upload.single = function (fieldName) {
         await sftp.connect(sftpConfig);
         await sftp.mkdir(process.env.OVH_UPLOAD_PATH, true);
 
-        const remotePath = `${process.env.OVH_UPLOAD_PATH}/${req.file.originalname}`;
+        const filename = req.file.originalname;
+        const remotePath = `${process.env.OVH_UPLOAD_PATH}/${filename}`;
+
+        // Upload to OVH
         await sftp.put(req.file.path, remotePath);
         await sftp.end();
 
-        // Replace local path with OVH path for DB
-        req.file.url = remotePath;
-        req.file.path = remotePath; // so your controller uses it automatically
+        // Replace with public URL for DB
+        req.file.url = `${PUBLIC_BASE_URL}/${filename}`;
+        req.file.path = req.file.url; // controller will now store the URL
 
-        console.log("✅ File uploaded to OVH:", remotePath);
+        console.log("✅ File uploaded to OVH:", req.file.url);
         next();
       } catch (err) {
         console.error("❌ SFTP upload error:", err.message);
@@ -60,7 +65,7 @@ upload.single = function (fieldName) {
   };
 };
 
-// --- Override .array() too for multiple files ---
+// --- Override .array() ---
 const originalArray = upload.array.bind(upload);
 upload.array = function (fieldName, maxCount) {
   const middleware = originalArray(fieldName, maxCount);
@@ -77,15 +82,19 @@ upload.array = function (fieldName, maxCount) {
 
         await Promise.all(
           req.files.map(async (file) => {
-            const remotePath = `${process.env.OVH_UPLOAD_PATH}/${file.originalname}`;
+            const filename = file.originalname;
+            const remotePath = `${process.env.OVH_UPLOAD_PATH}/${filename}`;
+
             await sftp.put(file.path, remotePath);
-            file.url = remotePath;
-            file.path = remotePath; // update path for DB
+
+            // Replace with public URL for DB
+            file.url = `${PUBLIC_BASE_URL}/${filename}`;
+            file.path = file.url;
           })
         );
 
         await sftp.end();
-        console.log("✅ All files uploaded to OVH successfully");
+        console.log("✅ All files uploaded to OVH and URLs ready");
         next();
       } catch (err) {
         console.error("❌ SFTP upload error:", err.message);
