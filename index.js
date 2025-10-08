@@ -74,6 +74,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const nettoyageRoutes = require("./routes/nettoyageRoutes");
 const roomServiceOrderRoutes = require("./routes/roomServiceOrderRoutes");
 const pageContentRoutes = require("./routes/pageContentRoutes");
+const spaCategoryRoutes = require("./routes/spaCategoryRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
