@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../middleware/upload"); // ✅ Your multer config
 
 const {
   createSpa,
@@ -11,7 +12,7 @@ const {
 } = require("../controllers/spaController");
 
 // ✅ Create a Spa (categories only)
-router.post("/", createSpa);
+router.post("/", upload.single("image"), createSpa);
 
 // ✅ Get all Spas
 router.get("/", getAllSpas);
@@ -20,7 +21,7 @@ router.get("/", getAllSpas);
 router.get("/:id", getSpaById);
 
 // ✅ Update Spa (replace categories)
-router.put("/:id", updateSpa);
+router.put("/:id", upload.single("image"), updateSpa);
 
 // ✅ Delete Spa
 router.delete("/:id", deleteSpa);

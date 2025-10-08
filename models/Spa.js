@@ -13,7 +13,11 @@ const spaServiceSchema = new mongoose.Schema({
 
 const spaCategorySchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true },  // e.g. "FORFAITS / PACKAGE"
-  services: [spaServiceSchema]
+  services: [spaServiceSchema],
+    image: {
+    type: String,
+    default: "" // Cloudinary URL or local path
+  },
 });
 
 const spaSchema = new mongoose.Schema(

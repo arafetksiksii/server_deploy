@@ -1,12 +1,17 @@
 const Spa = require("../models/Spa");
 
-// ✅ Create Spa (with categories and service reservable)
+// ✅ Create Spa (with one image per category)
 exports.createSpa = async (req, res) => {
   try {
-    const { categories } = req.body;
+    let { categories } = req.body;
 
     if (!categories || !Array.isArray(categories)) {
       return res.status(400).json({ message: "Categories are required and must be an array" });
+    }
+
+    // Add image if provided
+    if (req.file) {
+      categories[0].image = req.file.path; // first category’s image
     }
 
     // Ensure each service has a reservable boolean
@@ -52,13 +57,18 @@ exports.getSpaById = async (req, res) => {
   }
 };
 
-// ✅ Update Spa (replace categories)
+// ✅ Update Spa (with one image per category)
 exports.updateSpa = async (req, res) => {
   try {
-    const { categories } = req.body;
+    let { categories } = req.body;
 
     if (!categories || !Array.isArray(categories)) {
       return res.status(400).json({ message: "Categories are required and must be an array" });
+    }
+
+    // Update image if provided
+    if (req.file) {
+      categories[0].image = req.file.path; // update the first category’s image
     }
 
     // Ensure each service has a reservable boolean
@@ -102,4 +112,3 @@ exports.deleteSpa = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
