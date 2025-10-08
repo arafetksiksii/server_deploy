@@ -21,6 +21,7 @@ exports.createSpaCategory = async (req, res) => {
     await spaCategory.save();
 
     res.status(201).json(spaCategory);
+    
   } catch (err) {
     console.error("❌ Error creating spa category:", err.message);
     res.status(500).json({ message: err.message });
