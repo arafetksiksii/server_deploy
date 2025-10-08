@@ -97,6 +97,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/nettoyages", nettoyageRoutes);
 app.use("/api/roomservice-orders", roomServiceOrderRoutes);
 app.use("/api/page-contents", pageContentRoutes);
+app.use("/api/spa-categories", spaCategoryRoutes);
 // Protected route example
 const authenticateToken = require("./middleware/authMiddleware");
 app.get("/api/protected", authenticateToken, (req, res) => {
