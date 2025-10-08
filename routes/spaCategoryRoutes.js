@@ -8,7 +8,7 @@ const {
   getSpaCategoryById,
   updateSpaCategory,
   deleteSpaCategory
-} = require("../controllers/spaCategoryController");
+} = require("../controllers/SpaCategoryController");
 
 // Create a new Spa Category (with image)
 router.post("/", upload.single("image"), createSpaCategory);
