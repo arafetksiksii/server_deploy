@@ -1,6 +1,6 @@
 const Spa = require("../models/Spa");
 
-// ✅ Create Spa (with one image per category)
+// ✅ Create Spa (with categories, services, and category images)
 exports.createSpa = async (req, res) => {
   try {
     let { categories } = req.body;
@@ -9,9 +9,14 @@ exports.createSpa = async (req, res) => {
       return res.status(400).json({ message: "Categories are required and must be an array" });
     }
 
-    // Add image if provided
-    if (req.file) {
-      categories[0].image = req.file.path; // first category’s image
+    // Handle images for categories (req.files)
+    if (req.files && req.files.length > 0) {
+      categories = categories.map((cat, index) => {
+        return {
+          ...cat,
+          image: req.files[index] ? req.files[index].path : cat.image || ""
+        };
+      });
     }
 
     // Ensure each service has a reservable boolean
@@ -57,7 +62,7 @@ exports.getSpaById = async (req, res) => {
   }
 };
 
-// ✅ Update Spa (with one image per category)
+// ✅ Update Spa (replace categories & images)
 exports.updateSpa = async (req, res) => {
   try {
     let { categories } = req.body;
@@ -66,9 +71,14 @@ exports.updateSpa = async (req, res) => {
       return res.status(400).json({ message: "Categories are required and must be an array" });
     }
 
-    // Update image if provided
-    if (req.file) {
-      categories[0].image = req.file.path; // update the first category’s image
+    // Handle images for updated categories
+    if (req.files && req.files.length > 0) {
+      categories = categories.map((cat, index) => {
+        return {
+          ...cat,
+          image: req.files[index] ? req.files[index].path : cat.image || ""
+        };
+      });
     }
 
     // Ensure each service has a reservable boolean
