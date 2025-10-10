@@ -75,6 +75,8 @@ const nettoyageRoutes = require("./routes/nettoyageRoutes");
 const roomServiceOrderRoutes = require("./routes/roomServiceOrderRoutes");
 const pageContentRoutes = require("./routes/pageContentRoutes");
 const spaCategoryRoutes = require("./routes/spaCategoryRoutes");
+const questionnaireRoutes = require("./routes/questionnaireRoutes");
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
@@ -98,6 +100,8 @@ app.use("/api/nettoyages", nettoyageRoutes);
 app.use("/api/roomservice-orders", roomServiceOrderRoutes);
 app.use("/api/page-contents", pageContentRoutes);
 app.use("/api/spa-categories", spaCategoryRoutes);
+app.use("/api/questionnaires", questionnaireRoutes);
+
 // Protected route example
 const authenticateToken = require("./middleware/authMiddleware");
 app.get("/api/protected", authenticateToken, (req, res) => {
