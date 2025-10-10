@@ -78,7 +78,7 @@ const spaCategoryRoutes = require("./routes/spaCategoryRoutes");
 const questionnaireRoutes = require("./routes/questionnaireRoutes");
 const skipCleanRoutes = require("./routes/skipCleanRoutes");
 
-app.use("/api/skip-cleans", skipCleanRoutes);
+app.use("/api/skipcleans", skipCleanRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
