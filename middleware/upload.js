@@ -2,6 +2,7 @@ const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
 const Client = require("ssh2-sftp-client");
+const sharp = require("sharp"); // <-- add sharp
 require("dotenv").config();
 
 // SFTP config
@@ -29,6 +30,26 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// --- Helper: compress large images (>8MB) ---
+async function compressIfLarge(file) {
+  const stats = fs.statSync(file.path);
+  if (stats.size > 8 * 1024 * 1024) { // >8 MB
+    console.log(`⚡ Compressing large image: ${file.originalname}`);
+
+    const ext = path.extname(file.originalname).toLowerCase();
+    const optimizedPath = file.path.replace(ext, `-optimized${ext}`);
+
+    await sharp(file.path)
+      .resize({ width: 1920, withoutEnlargement: true }) // max width 1920px
+      .jpeg({ quality: 80 }) // convert to jpeg at 80% quality
+      .toFile(optimizedPath);
+
+    fs.unlinkSync(file.path); // delete original
+    file.path = optimizedPath;
+  }
+  return file;
+}
+
 // --- Override .single() ---
 const originalSingle = upload.single.bind(upload);
 upload.single = function (fieldName) {
@@ -39,8 +60,11 @@ upload.single = function (fieldName) {
       if (err) return next(err);
       if (!req.file) return next();
 
-      const sftp = new Client();
       try {
+        // compress if too big
+        await compressIfLarge(req.file);
+
+        const sftp = new Client();
         await sftp.connect(sftpConfig);
         await sftp.mkdir(process.env.OVH_UPLOAD_PATH, true);
 
@@ -75,8 +99,11 @@ upload.array = function (fieldName, maxCount) {
       if (err) return next(err);
       if (!req.files || req.files.length === 0) return next();
 
-      const sftp = new Client();
       try {
+        // compress large ones
+        await Promise.all(req.files.map(compressIfLarge));
+
+        const sftp = new Client();
         await sftp.connect(sftpConfig);
         await sftp.mkdir(process.env.OVH_UPLOAD_PATH, true);
 
