@@ -4,12 +4,17 @@ const nodemailer = require("nodemailer");
 const User = require("../models/User"); // import user model
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER,     // e.g., yourapp@gmail.com
-    pass: process.env.EMAIL_PASS      // app-specific password
-  }
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  logger: true,   // log SMTP communication
+  debug: true
 });
+
 async function sendReservationNotification(reservation) {
   try {
     // Create a case-insensitive regex for the service
