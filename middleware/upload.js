@@ -68,7 +68,9 @@ upload.single = function (fieldName) {
         await sftp.connect(sftpConfig);
         await sftp.mkdir(process.env.OVH_UPLOAD_PATH, true);
 
-        const filename = req.file.originalname;
+const ext = path.extname(req.file.originalname) || ".jpg";
+const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+const filename = uniqueName;
         const remotePath = `${process.env.OVH_UPLOAD_PATH}/${filename}`;
 
         // Upload to OVH
