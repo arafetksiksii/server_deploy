@@ -1,6 +1,7 @@
 const Reservation = require("../models/Reservation");
 const Notification = require("../models/notification")
 const nodemailer = require("nodemailer");
+const User = require("../models/User"); // import user model
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -9,6 +10,38 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS      // app-specific password
   }
 });
+async function sendReservationNotification(reservation) {
+  try {
+    // Find all users with role 'admin' or matching reservation service
+    const users = await User.find({
+      role: { $in: ["admin", reservation.service.toLowerCase()] } // make sure roles are lowercase if needed
+    });
+
+    if (!users || users.length === 0) return;
+
+    // Create email addresses array
+    const emails = users.map(u => u.email);
+
+    // Email content
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: emails, // nodemailer can send to multiple addresses
+      subject: "Nouvelle réservation",
+      text: `Bonjour,\n\nUne nouvelle réservation a été effectuée par ${reservation.name} pour ${reservation.service} à ${new Date(reservation.to).toLocaleString()}.\nRoom: ${reservation.room}\n\nMerci.\nL'équipe Novotel.`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Erreur d'envoi d'email :", error);
+      } else {
+        console.log("Email envoyé aux responsables :", info.response);
+      }
+    });
+
+  } catch (err) {
+    console.error("Erreur lors de l'envoi des emails de notification :", err.message);
+  }
+}
 
 
 // CREATE
@@ -54,6 +87,9 @@ exports.createReservation = async (req, res) => {
     });
 
     await notification.save();
+
+    // ✅ Send email to relevant users
+    await sendReservationNotification(reservation);
 
     res.status(201).json(reservation);
   } catch (err) {
