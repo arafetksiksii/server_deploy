@@ -12,20 +12,23 @@ const transporter = nodemailer.createTransport({
 });
 async function sendReservationNotification(reservation) {
   try {
-    // Find all users with role 'admin' or matching reservation service
+    // Create a case-insensitive regex for the service
+    const serviceRegex = new RegExp(`^${reservation.service}$`, "i"); // matches exact, ignoring case
+
+    // Find all users with role 'admin' or matching reservation service (case-insensitive)
     const users = await User.find({
-      role: { $in: ["admin", reservation.service.toLowerCase()] } // make sure roles are lowercase if needed
-    });
+      role: { $elemMatch: { $in: ["admin"] } } // admin always included
+    }).or([
+      { role: serviceRegex } // matches any role exactly like the service ignoring case
+    ]);
 
     if (!users || users.length === 0) return;
 
-    // Create email addresses array
     const emails = users.map(u => u.email);
 
-    // Email content
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: emails, // nodemailer can send to multiple addresses
+      to: emails,
       subject: "Nouvelle réservation",
       text: `Bonjour,\n\nUne nouvelle réservation a été effectuée par ${reservation.name} pour ${reservation.service} à ${new Date(reservation.to).toLocaleString()}.\nRoom: ${reservation.room}\n\nMerci.\nL'équipe Novotel.`
     };
