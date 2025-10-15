@@ -77,6 +77,9 @@ const pageContentRoutes = require("./routes/pageContentRoutes");
 const spaCategoryRoutes = require("./routes/spaCategoryRoutes");
 const questionnaireRoutes = require("./routes/questionnaireRoutes");
 const skipCleanRoutes = require("./routes/skipCleanRoutes");
+const questionnaireResponseRoutes = require("./routes/questionnaireResponseRoutes");
+
+app.use("/api/questionnaire-responses", questionnaireResponseRoutes);
 
 app.use("/api/skipcleans", skipCleanRoutes);
 

@@ -1,41 +1,41 @@
 const mongoose = require("mongoose");
 
+const questionSchema = new mongoose.Schema({
+  questionId: { 
+    type: String, 
+    required: true 
+  }, // Unique ID for matching responses
+  questionText: { 
+    type: String, 
+    required: true 
+  },
+  responseType: { 
+    type: String, 
+    enum: ["boolean", "text", "number", "rating", "multiple_choice"],
+    required: true 
+  },
+  options: [String], // only used if responseType = "multiple_choice"
+  category: { 
+    type: String 
+  }, // optional (ex: "Chambre", "Petit-déjeuner")
+  required: { 
+    type: Boolean, 
+    default: false 
+  },
+  order: { 
+    type: Number 
+  } // optional, helps frontend display order
+});
+
 const questionnaireSchema = new mongoose.Schema({
-  // Identité client
-  numeroChambre: { type: String },
-  nomFamille: { type: String },
-  numeroTelephone: { type: String },
-  demandeSpeciale: { type: String },
-
-  // Questions
-  enregistrementRapide: { type: Boolean },  // Avez-vous enregistré à l'hôtel rapidement ?
-  butVisite: { type: String, enum: ["Entreprise", "Loisir", "Autre"] },
-  commentaireVisite: { type: String },
-
-  receptionnistePoli: { type: Boolean }, // Le réceptionniste était-il poli ?
-  commentaireReceptionniste: { type: String },
-
-  infosNecessaires: { type: Boolean }, // Avez-vous reçu toutes les informations nécessaires ?
-  commentaireInfos: { type: String },
-
-  temperatureConfortable: { type: Boolean }, // La température de la chambre est-elle confortable ?
-  commentaireTemperature: { type: String },
-
-  toutDisponible: { type: Boolean }, // Tout ce dont vous avez besoin est-il disponible dans la chambre ?
-  commentaireDisponibilite: { type: String },
-
-  equipementFonctionne: { type: Boolean }, // L'équipement et les meubles fonctionnent-ils correctement ?
-  commentaireEquipement: { type: String },
-
-  propreteManquements: { type: Boolean }, // Y a-t-il des manquements dans la propreté ?
-  
-  problemeWifi: { type: Boolean }, // Avez-vous déjà eu des problèmes avec votre Wi-Fi ?
-  commentaireWifi: { type: String },
-
-  petitDejeunerDelicieux: { type: Boolean }, // Tous les plats du petit-déjeuner étaient-ils délicieux ?
-  commentairePetitDejeuner: { type: String },
-
-  ameliorations: { type: String }, // Que pourrions-nous améliorer ?
+  title: { 
+    type: String, 
+    default: "Questionnaire de satisfaction client" 
+  },
+  description: { 
+    type: String 
+  },
+  questions: [questionSchema], // dynamic list of questions
 }, { timestamps: true });
 
 module.exports = mongoose.model("Questionnaire", questionnaireSchema);
