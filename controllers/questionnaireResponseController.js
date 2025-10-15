@@ -1,6 +1,63 @@
 const QuestionnaireResponse = require("../models/QuestionnaireResponse");
 const Questionnaire = require("../models/Questionnaire");
+const User = require("../models/User");
+const Notification = require("../models/notification");
+const nodemailer = require("nodemailer");
 
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  logger: true,
+  debug: true,
+});
+
+async function sendQuestionnaireNotification(response, questionnaire) {
+  try {
+    // Find all admins and users with role 'questionnaire'
+    const users = await User.find({
+      $or: [
+        { role: { $elemMatch: { $in: ["admin"] } } },
+        { role: { $elemMatch: { $in: ["questionnaire"] } } },
+      ],
+    });
+
+    if (!users || users.length === 0) return;
+
+    const emails = users.map((u) => u.email);
+
+    const description = `Nouvelle réponse au questionnaire "${questionnaire.title}" a été soumise.`;
+
+    // Save notification
+    const notification = new Notification({
+      description,
+      service: "questionnaire",
+    });
+    await notification.save();
+
+    // Send email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: emails,
+      subject: "Nouvelle réponse au questionnaire",
+      text: `Bonjour,\n\nUne nouvelle réponse a été soumise au questionnaire "${questionnaire.title}".\n\nMerci.\nL'équipe.`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Erreur d'envoi d'email :", error);
+      } else {
+        console.log("Email envoyé aux responsables :", info.response);
+      }
+    });
+  } catch (err) {
+    console.error("Erreur lors de l'envoi des notifications questionnaire :", err.message);
+  }
+}
 // ✅ Create a new response (client submits answers)
 exports.createResponse = async (req, res) => {
   try {
@@ -18,6 +75,8 @@ exports.createResponse = async (req, res) => {
     });
 
     const savedResponse = await newResponse.save();
+        // ✅ Send notification and email to admins/questionnaire users
+    await sendQuestionnaireNotification(savedResponse, questionnaire);
     res.status(201).json(savedResponse);
   } catch (err) {
     res.status(400).json({ error: err.message });
