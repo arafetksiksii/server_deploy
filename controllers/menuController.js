@@ -76,32 +76,62 @@ exports.getMenuById = async (req, res) => {
   }
 };
 
-exports.updateRestaurant = async (req, res) => {
+exports.updateMenu = async (req, res) => {
   try {
-    const { name, description, reservable } = req.body;
-    const updateFields = { name, description };
+    const { title, items, restaurant, roomService, skyLounge, existingImages } = req.body;
+    const parsedItems = items ? JSON.parse(items) : [];
+    
+    console.log("📥 Update Menu Request - existingImages:", existingImages);
+    console.log("📥 Update Menu Request - files:", req.files ? req.files.length : 0);
 
-    if (req.file) {
-      updateFields.image = req.file.path;
+    // First get the current menu (for validation only)
+    const currentMenu = await Menu.findById(req.params.id);
+    if (!currentMenu) return res.status(404).json({ message: "Menu not found" });
+
+    let finalImages = [];
+
+    // Handle existing images - use ONLY what frontend sends, don't fall back to database
+    if (existingImages) {
+      try {
+        const parsedExistingImages = JSON.parse(existingImages);
+        finalImages = [...parsedExistingImages];
+        console.log("✅ Using existingImages from frontend:", parsedExistingImages.length);
+      } catch (parseErr) {
+        console.error("❌ Failed to parse existingImages:", parseErr.message);
+        // If parsing fails, use empty array instead of database images
+        finalImages = [];
+      }
+    } else {
+      // If no existingImages sent, use empty array (images were removed)
+      finalImages = [];
     }
 
-    if (reservable !== undefined) {
-      updateFields.reservable = reservable;
+    // Add new images if any were uploaded
+    if (req.files && req.files.length > 0) {
+      const newImagePaths = req.files.map(file => file.path);
+      finalImages = [...finalImages, ...newImagePaths];
+      console.log("✅ Adding new images:", newImagePaths.length);
     }
 
-    const restaurant = await Restaurant.findByIdAndUpdate(
-      req.params.id,
-      updateFields,
-      { new: true }
-    );
-    if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
+    console.log("✅ Final images array:", finalImages);
+
+    const updateFields = {
+      title,
+      items: parsedItems,
+      restaurant,
+      roomService,
+      skyLounge,
+      images: finalImages
+    };
+
+    const menu = await Menu.findByIdAndUpdate(req.params.id, updateFields, { new: true });
 
     const io = req.app.get("io");
-    io.emit("restaurantUpdated", restaurant);
+    io.emit("menuUpdated", menu);
 
-    res.status(200).json(restaurant);
+    res.status(200).json(menu);
   } catch (err) {
-    console.error("❌ Error updating restaurant:", err.message);
+    console.error("❌ Menu update error:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
