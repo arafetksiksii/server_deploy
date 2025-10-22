@@ -76,37 +76,35 @@ exports.getMenuById = async (req, res) => {
   }
 };
 
-exports.updateMenu = async (req, res) => {
+exports.updateRestaurant = async (req, res) => {
   try {
-    const { title, items, restaurant, roomService, skyLounge } = req.body;
-    const parsedItems = items ? JSON.parse(items) : [];
+    const { name, description, reservable } = req.body;
+    const updateFields = { name, description };
 
-    const updateFields = {
-      title,
-      items: parsedItems,
-      restaurant,
-      roomService,
-      skyLounge
-    };
-
-    // If new images were uploaded, replace existing images
-    if (req.files && req.files.length > 0) {
-      updateFields.images = req.files.map(file => file.path);
+    if (req.file) {
+      updateFields.image = req.file.path;
     }
 
-    const menu = await Menu.findByIdAndUpdate(req.params.id, updateFields, { new: true });
-    if (!menu) return res.status(404).json({ message: "Menu not found" });
+    if (reservable !== undefined) {
+      updateFields.reservable = reservable;
+    }
+
+    const restaurant = await Restaurant.findByIdAndUpdate(
+      req.params.id,
+      updateFields,
+      { new: true }
+    );
+    if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
 
     const io = req.app.get("io");
-    io.emit("menuUpdated", menu);
+    io.emit("restaurantUpdated", restaurant);
 
-    res.status(200).json(menu);
+    res.status(200).json(restaurant);
   } catch (err) {
-    console.error("❌ Menu update error:", err.message);
+    console.error("❌ Error updating restaurant:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
-
 
 
 exports.deleteMenu = async (req, res) => {
