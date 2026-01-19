@@ -65,6 +65,8 @@ const seminaireRoutes = require("./routes/seminaireRoutes");
 const spaRoutes = require("./routes/spaRoutes");
 const loisirRoutes = require("./routes/loisirRoutes");
 const skyLoungeRoutes = require("./routes/skyLoungeRoutes");
+const terrassePiscineRoutes = require("./routes/terrassePiscineRoutes");
+const chambreRoutes = require("./routes/chambreRoutes");
 const evenementRoutes = require("./routes/evenementRoutes");
 const roomServiceRoutes = require("./routes/roomServiceRoutes");
 const reservationRoutes = require("./routes/reservationRoutes");
@@ -78,7 +80,11 @@ const spaCategoryRoutes = require("./routes/spaCategoryRoutes");
 const questionnaireRoutes = require("./routes/questionnaireRoutes");
 const skipCleanRoutes = require("./routes/skipCleanRoutes");
 const questionnaireResponseRoutes = require("./routes/questionnaireResponseRoutes");
-
+// 🔹 Middleware pour afficher les requêtes
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
 app.use("/api/questionnaire-responses", questionnaireResponseRoutes);
 
 app.use("/api/skipcleans", skipCleanRoutes);
@@ -95,6 +101,8 @@ app.use("/api/seminaires", seminaireRoutes);
 app.use("/api/spas", spaRoutes);
 app.use("/api/loisirs", loisirRoutes);
 app.use("/api/sky-lounges", skyLoungeRoutes);
+app.use("/api/terrasses-piscine", terrassePiscineRoutes);
+app.use("/api/chambres", chambreRoutes);
 app.use("/api/evenements", evenementRoutes);
 app.use("/api/room-services", roomServiceRoutes);
 app.use("/api/reservations", reservationRoutes);
@@ -112,6 +120,10 @@ const authenticateToken = require("./middleware/authMiddleware");
 app.get("/api/protected", authenticateToken, (req, res) => {
   res.json({ message: "This is protected data", user: req.user });
 });
+// Health check route
+app.get("/api/health", (req, res) => {
+  res.json({ status: "OK", timestamp: new Date() });
+});
 
 // Socket.IO connection handler
 io.on("connection", (socket) => {
@@ -123,7 +135,6 @@ io.on("connection", (socket) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () =>
-  console.log(`🚀 Server with Socket.IO running on port ${PORT}`)
-);
+app.listen(5000, "0.0.0.0", () => {
+  console.log("✅ TEST SERVER running on port 5000")
+})
