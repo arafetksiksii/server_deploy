@@ -16,13 +16,62 @@ const itemSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // default is not local
   },
-  isGlutenFree: {
+  // Allergens (14 boolean fields)
+  allergenArachide: {
     type: Boolean,
-    default: false, // default is not gluten-free
+    default: false,
   },
-  isLactoseFree: {
+  allergenCeleri: {
     type: Boolean,
-    default: false, // default is not lactose-free
+    default: false,
+  },
+  allergenCrustaces: {
+    type: Boolean,
+    default: false,
+  },
+  allergenGluten: {
+    type: Boolean,
+    default: false,
+  },
+  allergenFruitsACoque: {
+    type: Boolean,
+    default: false,
+  },
+  allergenLait: {
+    type: Boolean,
+    default: false,
+  },
+  allergenLupin: {
+    type: Boolean,
+    default: false,
+  },
+  allergenOeuf: {
+    type: Boolean,
+    default: false,
+  },
+  allergenPoisson: {
+    type: Boolean,
+    default: false,
+  },
+  allergenMollusques: {
+    type: Boolean,
+    default: false,
+  },
+  allergenMoutarde: {
+    type: Boolean,
+    default: false,
+  },
+  allergenSesame: {
+    type: Boolean,
+    default: false,
+  },
+  allergenSoja: {
+    type: Boolean,
+    default: false,
+  },
+  allergenSulfites: {
+    type: Boolean,
+    default: false,
   },
     isAvailable24_7: {
     type: Boolean,

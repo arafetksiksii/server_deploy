@@ -47,13 +47,14 @@ const storage = multer.diskStorage({
   },
 });
 
-// Configure multer with file size limits (unlimited for PDFs, 50MB for images)
-// Set to 1GB to effectively allow unlimited PDF uploads
+// Configure multer with file size limits
+// Augmenter les limites pour permettre l'upload de plusieurs images
 const upload = multer({ 
   storage,
   limits: {
-    fileSize: 1024 * 1024 * 1024, // 1GB per file (effectively unlimited for PDFs)
-    fieldSize: 1024 * 1024 * 1024, // 1GB for non-file fields
+    fileSize: 50 * 1024 * 1024, // 50MB par fichier (suffisant pour les images)
+    fieldSize: 10 * 1024 * 1024, // 10MB pour les champs non-fichier
+    files: 21, // 1 image principale + 20 images supplémentaires
   }
 });
 
@@ -304,6 +305,22 @@ upload.fields = function (fields) {
         }
         res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
         res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+        
+        // Améliorer les messages d'erreur pour les erreurs de taille
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          err.message = `Fichier trop volumineux. Taille maximale: 50MB par fichier.`;
+        } else if (err.code === 'LIMIT_FILE_COUNT') {
+          err.message = `Trop de fichiers. Maximum: 21 fichiers (1 image principale + 20 images supplémentaires).`;
+        } else if (err.code === 'LIMIT_FIELD_KEY') {
+          err.message = `Trop de champs dans le formulaire.`;
+        } else if (err.code === 'LIMIT_FIELD_VALUE') {
+          err.message = `Valeur de champ trop grande. Maximum: 10MB par champ.`;
+        } else if (err.code === 'LIMIT_FIELD_COUNT') {
+          err.message = `Trop de champs dans le formulaire.`;
+        } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+          err.message = `Champ de fichier inattendu.`;
+        }
+        
         return next(err);
       }
       if (!req.files) return next();

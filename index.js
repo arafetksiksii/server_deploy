@@ -49,7 +49,18 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+// Augmenter les limites de taille pour les requêtes JSON et URL-encoded
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
+
+// Middleware pour augmenter la limite de taille de requête (pour les requêtes multipart)
+app.use((req, res, next) => {
+  // Augmenter la limite de taille de requête pour les uploads
+  req.setTimeout(300000); // 5 minutes timeout
+  res.setTimeout(300000);
+  next();
+});
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
@@ -123,6 +134,24 @@ app.get("/api/protected", authenticateToken, (req, res) => {
 // Health check route
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date() });
+});
+
+// Middleware de gestion d'erreur global pour les erreurs 413
+app.use((err, req, res, next) => {
+  // Gérer les erreurs de taille de requête
+  if (err.code === 'LIMIT_FILE_SIZE' || err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_FIELD_VALUE') {
+    return res.status(413).json({
+      message: err.message || 'Request Entity Too Large',
+      code: err.code,
+      details: 'La taille totale de la requête dépasse la limite autorisée. Veuillez réduire la taille des images ou envoyer moins de fichiers.'
+    });
+  }
+  
+  // Autres erreurs
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error'
+  });
 });
 
 // Socket.IO connection handler

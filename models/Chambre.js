@@ -2,13 +2,28 @@ const mongoose = require("mongoose");
 
 const chambreSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
-    description: { type: String, default: "" },
-    image: { type: String, default: "" }, // lien vers l'image (Cloudinary ou dossier uploads)
-    numero: { type: String, trim: true }, // numéro de chambre (ex: "101", "Suite 201")
-    type: { type: String, default: "" }, // type de chambre (ex: "Standard", "Deluxe", "Suite")
-    capacite: { type: Number, default: 2 }, // nombre de personnes
-    prix: { type: Number, default: 0 }, // prix par nuit
+    // Champs multilingues
+    name: {
+      fr: { type: String, trim: true },
+      ar: { type: String, trim: true },
+      en: { type: String, trim: true },
+    },
+    descriptionCourte: {
+      fr: { type: String, default: "" },
+      ar: { type: String, default: "" },
+      en: { type: String, default: "" },
+    },
+    descriptionDetaillee: {
+      fr: { type: String, default: "" },
+      ar: { type: String, default: "" },
+      en: { type: String, default: "" },
+    },
+    // Anciens champs (rétrocompatibilité - dépréciés)
+    description: { type: String, default: "" }, // description du type de chambre (déprécié, utiliser descriptionDetaillee)
+    imagePrincipale: { type: String, default: "" }, // image principale pour la présentation
+    images: [{ type: String }], // tableau d'images supplémentaires pour la galerie
+    type: { type: String, default: "" }, // catégorie du type (ex: "Standard", "Deluxe", "Suite", "Présidentielle")
+    capacite: { type: Number, default: 2 }, // capacité maximale (nombre de personnes)
     menus: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -17,7 +32,7 @@ const chambreSchema = new mongoose.Schema(
     ],
     reservable: {
       type: Boolean,
-      default: true, // true = réservable par défaut
+      default: true, // si ce type de chambre est réservable
     },
   },
   { timestamps: true }
